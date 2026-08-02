@@ -175,20 +175,32 @@ function heroFor(post) {
  * 少了它，文章頁會去要 /<slug>/assets/img/... —— Cloudflare Pages 對這種
  * 路徑會回 200 但內容是首頁 HTML，瀏覽器拿到 HTML 當圖片，靜靜地壞掉。
  */
-function heroBlock({ eyebrow, title, lede, hero, up = '' }) {
+function heroBlock({ eyebrow, title, lede, hero, up = '', zoom = false }) {
   const h = hero || site.hero;
-  return `
-      <section class="hero">
-        <figure class="hero__figure">
-          <img
+  const src = escapeHtml(up + h.src);
+
+  // 文章的主視覺常是資訊圖，手機上字太小，包一層連結讓人點開看原尺寸。
+  const img = `<img
             class="hero__img"
-            src="${escapeHtml(up + h.src)}"
+            src="${src}"
             alt="${escapeHtml(h.alt)}"
             width="${h.width}"
             height="${h.height}"
             fetchpriority="high"
             decoding="async"
-          />
+          />`;
+
+  return `
+      <section class="hero">
+        <figure class="hero__figure">
+          ${
+            zoom
+              ? `<a class="hero__zoom" href="${src}" target="_blank" rel="noopener noreferrer" aria-label="以原尺寸開啟主視覺圖片">
+            ${img}
+          </a>
+          <figcaption class="hero__hint">點圖可放大</figcaption>`
+              : img
+          }
         </figure>
         <div class="hero__text">
           ${eyebrow ? `<p class="hero__eyebrow">${escapeHtml(eyebrow)}</p>` : ''}
@@ -409,6 +421,7 @@ function renderPost(post) {
     lede: post.summary,
     hero,
     up: '../',
+    zoom: true,
   })}
       <div class="wrap">
         <article class="post">

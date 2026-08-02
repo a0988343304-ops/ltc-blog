@@ -148,6 +148,23 @@ h1, h2, h3, h4 { line-height: 1.35; text-wrap: balance; }
   background: var(--border);
 }
 
+/* 可放大的主視覺 */
+.hero__zoom {
+  display: block;
+  max-width: var(--content);
+  margin-inline: auto;
+  border-radius: var(--radius);
+}
+.hero__zoom .hero__img { cursor: zoom-in; }
+.hero__zoom:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
+
+.hero__hint {
+  max-width: var(--content);
+  margin: .55rem auto 0;
+  font-size: .78rem;
+  color: var(--text-muted);
+}
+
 .hero__text {
   max-width: var(--content);
   margin: clamp(1.25rem, 4vw, 2rem) auto 0;
