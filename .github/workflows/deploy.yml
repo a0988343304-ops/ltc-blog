@@ -1,6 +1,6 @@
-name: Deploy to Cloudflare Pages
+name: Build and deploy
 
-# 推上 main 之後，自動把 docs/ 同步部署到 Cloudflare Pages。
+# 推上 main 之後：重新建置 → 若 docs/ 有落差就推回 → 部署到 Cloudflare Pages。
 # GitHub Pages 由 GitHub 自己從 main 的 /docs 供應，不需要在這裡處理。
 
 on:
@@ -9,19 +9,24 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write # 需要把重建後的 docs/ 推回
 
 concurrency:
-  group: pages-deploy
-  cancel-in-progress: true
+  group: deploy
+  cancel-in-progress: false # 部署不要互相取消，排隊跑完
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    env:
+      # 拉到 env 才能在 if: 條件裡判斷（secrets context 不能直接用在 if）
+      CF_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+
     steps:
       - uses: actions/checkout@v4
         with:
-          # build.mjs 依 git 歷史推算文章的最後更新日期，需要完整歷史
+          # build.mjs 用 git 歷史推算每篇文章的最後更新日期，
+          # 淺層 clone 會讓日期失準，這裡必須拉完整歷史。
           fetch-depth: 0
 
       - uses: actions/setup-node@v4
@@ -31,13 +36,32 @@ jobs:
 
       - run: npm ci
 
-      # 重新建置一次，確保 docs/ 與 content/ 一致
-      # （若有人只改了 .md 卻忘記在本機 build）
       - run: npm run build
 
-      - name: Deploy to Cloudflare Pages
+      # 有人只改了 .md 卻忘記在本機 build 時，這一步會補上，
+      # 讓 GitHub Pages（讀 docs/）與 Cloudflare 兩邊內容一致。
+      - name: 若 docs/ 有落差則推回
+        run: |
+          if [ -n "$(git status --porcelain docs)" ]; then
+            git config user.name  "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add docs
+            git commit -m "build: 重新產生 docs/ [automated]"
+            git push
+            echo "docs/ 與原始內容不一致，已重建並推回。"
+          else
+            echo "docs/ 已是最新，不需重建。"
+          fi
+
+      - name: 部署到 Cloudflare Pages
+        if: env.CF_API_TOKEN != ''
         uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: pages deploy docs --project-name=ltc-blog --branch=main
+          command: pages deploy
+
+      - name: 尚未設定 token 時的提示
+        if: env.CF_API_TOKEN == ''
+        run: |
+          echo "::warning title=略過 Cloudflare 部署::尚未設定 CLOUDFLARE_API_TOKEN secret，本次只完成建置。設定後重跑即可自動部署。"
