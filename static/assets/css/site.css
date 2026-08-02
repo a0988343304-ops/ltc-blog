@@ -336,6 +336,29 @@ h1, h2, h3, h4 { line-height: 1.35; text-wrap: balance; }
 
 .prose img { border-radius: 10px; margin: 1.5rem auto; }
 
+/* 文章內的資訊圖：等比例縮放、可點擊放大、附圖說 */
+.prose figure {
+  margin: 1.75rem 0;
+  /* figure 預設有左右 margin，會讓寬圖看起來偏移 */
+}
+
+.prose figure img {
+  width: 100%;
+  margin: 0;
+  border: 1px solid var(--border);
+  background: #fff;   /* 資訊圖多為白底，深色模式下才不會透出深色 */
+}
+
+.prose figure a { display: block; }
+
+.prose figcaption {
+  margin-top: .6rem;
+  font-size: .82rem;
+  line-height: 1.65;
+  color: var(--text-muted);
+  text-align: center;
+}
+
 .prose hr { border: 0; border-top: 1px solid var(--border); margin: 2.25rem 0; }
 
 .post__back {

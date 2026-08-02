@@ -129,8 +129,15 @@ async function loadPosts() {
     });
   }
 
-  // 需求 7：最新的在前
-  posts.sort((a, b) => b.published - a.published || a.slug.localeCompare(b.slug));
+  // 需求 7：最新的在前。
+  // 同一天發布時，再比實際的更新時間，讓後來才加入的文章排在前面；
+  // 兩者都相同才退回 slug（純粹為了排序穩定，不是有意義的順序）。
+  posts.sort(
+    (a, b) =>
+      b.published - a.published ||
+      b.updated - a.updated ||
+      b.slug.localeCompare(a.slug),
+  );
   return posts;
 }
 
