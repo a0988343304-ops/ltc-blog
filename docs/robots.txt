@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://ltc-blog.pages.dev/sitemap.xml
