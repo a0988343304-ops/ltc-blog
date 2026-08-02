@@ -1,0 +1,14 @@
+# Cloudflare Pages 標頭設定。
+# build.mjs 的 cp(STATIC_DIR, OUT_DIR) 會把這個檔案複製到 docs/ 根目錄。
+#
+# /assets/* 底下的 CSS、JS、圖片一律長期快取：引用處都帶了 ?v=<內容雜湊>，
+# 內容一改網址就跟著改，所以 immutable 是安全的。
+# 沒有這一段時 Cloudflare Pages 預設回 max-age=0, must-revalidate，
+# 每一個資產每次回訪都要多付一個 RTT 等 304。
+
+/assets/*
+  Cache-Control: public, max-age=31536000, immutable
+
+# HTML 不快取：內容會改，而且它本來就靠 304 很便宜。
+/*.html
+  Cache-Control: public, max-age=0, must-revalidate

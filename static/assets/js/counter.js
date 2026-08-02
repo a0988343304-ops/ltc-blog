@@ -23,17 +23,21 @@
     var nodes = document.querySelectorAll('[data-views="' + slug.replace(/"/g, '\\"') + '"]');
     for (var i = 0; i < nodes.length; i++) {
       nodes[i].textContent = nf.format(n);
-      nodes[i].removeAttribute('aria-busy');
+      nodes[i].setAttribute('data-views-state', 'ready');
     }
   }
 
+  /** 任何失效路徑都要把「尚未載入」的佔位符收掉，不能讓它永遠留在畫面上 */
   function settle() {
-    var nodes = document.querySelectorAll('[data-views][aria-busy]');
+    var nodes = document.querySelectorAll('[data-views]:not([data-views-state="ready"])');
     for (var i = 0; i < nodes.length; i++) {
       nodes[i].textContent = '0';
-      nodes[i].removeAttribute('aria-busy');
+      nodes[i].setAttribute('data-views-state', 'ready');
     }
   }
+
+  // 腳本本身出錯（解析失敗、例外拋在 Promise 之外）也要能收尾
+  window.addEventListener('error', settle, { once: true });
 
   /** 這個工作階段是否已經為某個 slug 計過數 */
   function alreadyCounted(slug) {
@@ -63,18 +67,19 @@
     .then(function (r) { return r.ok ? r.json() : null; })
     .catch(function () { return null; });
 
-  Promise.all([bump, all]).then(function (res) {
-    var mine = res[0];
-    var map = res[1];
+  Promise.all([bump, all])
+    .then(function (res) {
+      var mine = res[0];
+      var map = res[1];
 
-    if (map && typeof map === 'object') {
-      for (var slug in map) {
-        if (Object.prototype.hasOwnProperty.call(map, slug)) paint(slug, map[slug]);
+      if (map && typeof map === 'object') {
+        for (var slug in map) {
+          if (Object.prototype.hasOwnProperty.call(map, slug)) paint(slug, map[slug]);
+        }
       }
-    }
-    // 本頁的數字用 POST 回傳值覆蓋，確保含這次瀏覽
-    if (mine && typeof mine.views === 'number') paint(mine.slug, mine.views);
-
-    settle();
-  });
+      // 本頁的數字用 POST 回傳值覆蓋，確保含這次瀏覽
+      if (mine && typeof mine.views === 'number') paint(mine.slug, mine.views);
+    })
+    // finally：就算上面的 then 自己拋例外，佔位符一樣會被收掉
+    .finally(settle);
 })();
