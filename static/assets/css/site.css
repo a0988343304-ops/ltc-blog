@@ -285,6 +285,24 @@ h1, h2, h3, h4 {
 .card:focus-within { transform: translateY(-2px); border-color: var(--accent); }
 .card > article { min-width: 0; }
 
+/* 卡片縮圖：滿版切齊卡片上緣，與卡片圓角對齊。
+   用固定 3/2 裁切讓每張卡的圖高度一致，網格才不會參差。 */
+.card__thumb {
+  display: block;
+  margin: calc(-1 * clamp(1rem, 3vw, 1.4rem)) calc(-1 * clamp(1rem, 3vw, 1.4rem)) clamp(.8rem, 2.5vw, 1.1rem);
+  border-radius: calc(var(--radius) - 1px) calc(var(--radius) - 1px) 0 0;
+  overflow: hidden;
+  background: var(--border);
+}
+
+.card__thumb img {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 3 / 2;
+  object-fit: cover;
+  display: block;
+}
+
 .card__title { margin: 0 0 .5rem; font-size: 1.12rem; }
 .card__title a { color: var(--heading); text-decoration: none; }
 .card__title a:hover { color: var(--accent); text-decoration: underline; }

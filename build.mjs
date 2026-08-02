@@ -489,8 +489,34 @@ function cardsBlock(posts) {
 ${posts
   .map((p) => {
     const sameDay = fmtDate(p.published) === fmtDate(p.updated);
+    const h = heroFor(p);
+
+    // 卡片縮圖。首頁在站台根目錄，所以路徑不需要 ../ 前綴。
+    const thumbWidths = h.srcsetWidths || site.hero?.srcsetWidths;
+    const thumbStem = String(h.src).replace(/\.[^./]+$/, '');
+    const thumbSrcset = Array.isArray(thumbWidths) && thumbWidths.length
+      ? escapeHtml(thumbWidths.map((w) => `${assetVer(`${thumbStem}-${w}.webp`)} ${w}w`).join(', '))
+      : '';
+
+    // alt 留空：縮圖對這張卡而言是裝飾，內容由緊接著的標題承載。
+    // 放 alt 會讓螢幕閱讀器在每個標題前先念一整段圖片描述。
+    // 連結重複指向同一篇，用 tabindex="-1" + aria-hidden 避免多一個 Tab 停留點。
+    const thumb = `<a class="card__thumb" href="${escapeHtml(p.slug)}/" tabindex="-1" aria-hidden="true">
+              <img
+                src="${escapeHtml(assetVer(h.src))}"${thumbSrcset ? `
+                srcset="${thumbSrcset}"
+                sizes="(max-width: 46rem) calc(100vw - 4rem), 27rem"` : ''}
+                alt=""
+                width="${h.width}"
+                height="${h.height}"
+                loading="lazy"
+                decoding="async"
+              />
+            </a>`;
+
     return `        <li class="card">
           <article>
+            ${thumb}
             <h3 class="card__title"><a href="${escapeHtml(p.slug)}/">${escapeHtml(p.title)}</a></h3>
             ${p.summary ? `<p class="card__summary">${escapeHtml(p.summary)}</p>` : ''}
             ${
