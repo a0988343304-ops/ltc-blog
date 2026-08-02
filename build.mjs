@@ -125,6 +125,16 @@ async function loadPosts() {
       tags: (data.tags || '').split(',').map((t) => t.trim()).filter(Boolean),
       published,
       updated,
+      // 文章專屬 HERO 圖（未指定時沿用站台預設）
+      heroImage: data.heroImage || '',
+      heroAlt: data.heroAlt || '',
+      heroWidth: data.heroWidth || '',
+      heroHeight: data.heroHeight || '',
+      heroCredit: data.heroCredit || '',
+      // 轉載資訊：原刊媒體、原文網址、原刊日期
+      originalSite: data.originalSite || '',
+      originalUrl: data.originalUrl || '',
+      originalDate: data.originalDate || '',
       html: marked.parse(body),
     });
   }
@@ -143,9 +153,24 @@ async function loadPosts() {
 
 /* -------------------------------------------------------------- 樣板 --- */
 
+/**
+ * 決定某篇文章要用哪張 HERO 圖。
+ * 文章 front matter 給了 heroImage 就用自己的，否則沿用站台預設圖。
+ */
+function heroFor(post) {
+  if (!post?.heroImage) return site.hero;
+  return {
+    src: `assets/img/${post.heroImage}`,
+    alt: post.heroAlt || post.title,
+    width: Number(post.heroWidth) || 1536,
+    height: Number(post.heroHeight) || 1024,
+    credit: post.heroCredit || '',   // 自有圖片：純文字標示，不涉授權條款
+  };
+}
+
 /** HERO 區。圖片等比例縮放，寬度由 CSS 限制在內容文字區寬度之內。 */
-function heroBlock({ eyebrow, title, lede }) {
-  const h = site.hero;
+function heroBlock({ eyebrow, title, lede, hero }) {
+  const h = hero || site.hero;
   return `
       <section class="hero">
         <figure class="hero__figure">
@@ -176,19 +201,28 @@ function heroBlock({ eyebrow, title, lede }) {
  */
 let contentUpdated = null;
 
-/** 需求 3：CC BY 出處標示放在 footer。 */
-function footerBlock() {
-  const h = site.hero;
+/**
+ * 需求 3：圖片出處標示放在 footer。
+ * 標示的是「這一頁實際使用的那張 HERO 圖」——用了自己的圖就不該還掛著
+ * CC BY 的授權聲明，那會變成錯誤標示。
+ */
+function footerBlock(hero) {
+  const h = hero || site.hero;
+
+  const creditBody = h.license
+    ? `本頁 HERO 圖：<cite>${escapeHtml(h.workTitle)}</cite>，
+            作者 ${escapeHtml(h.creator)}，
+            取自 <a href="${escapeHtml(h.sourceUrl)}" rel="license noopener noreferrer" target="_blank">Wikimedia Commons</a>，
+            依 <a href="${escapeHtml(h.licenseUrl)}" rel="license noopener noreferrer" target="_blank">${escapeHtml(h.license)}</a> 授權使用${h.modified ? '，本站已裁切調整' : '，未經修改'}。`
+    : escapeHtml(h.credit || '本頁 HERO 圖由本站作者製作。');
+
   return `
     <footer class="footer">
       <div class="wrap">
         <section class="credit">
           <h2 class="credit__head">圖片出處</h2>
           <p class="credit__body">
-            首頁與文章 HERO 圖：<cite>${escapeHtml(h.workTitle)}</cite>，
-            作者 ${escapeHtml(h.creator)}，
-            取自 <a href="${escapeHtml(h.sourceUrl)}" rel="license noopener noreferrer" target="_blank">Wikimedia Commons</a>，
-            依 <a href="${escapeHtml(h.licenseUrl)}" rel="license noopener noreferrer" target="_blank">${escapeHtml(h.license)}</a> 授權使用${h.modified ? '，本站已裁切調整' : '，未經修改'}。
+            ${creditBody}
           </p>
         </section>
         <p class="footer__meta">
@@ -204,16 +238,20 @@ function footerBlock() {
     </footer>`;
 }
 
-function layout({ title, description, bodyClass, pageSlug, head = '', content }) {
+function layout({ title, description, bodyClass, pageSlug, head = '', content, hero, canonicalOverride }) {
   const counter = site.counter || {};
   const up = pageSlug === 'site-home' ? '' : '../';
 
   // 同一份內容會同時出現在 GitHub Pages 與 Cloudflare Pages 兩個網址，
   // 用 canonical 指定 Cloudflare 這個正式網址，避免被判定為重複內容。
   const origin = (site.siteUrl || '').replace(/\/+$/, '');
-  const canonical = origin
+  const selfUrl = origin
     ? `${origin}/${pageSlug === 'site-home' ? '' : `${pageSlug}/`}`
     : '';
+
+  // 轉載文章把 canonical 指回原始出處，告訴搜尋引擎哪一份才是正本。
+  // 這是同步發表的標準做法，也是對原刊媒體的基本禮貌。
+  const canonical = canonicalOverride || selfUrl;
 
   return `<!doctype html>
 <html lang="${escapeHtml(site.lang)}">
@@ -249,7 +287,7 @@ ${head}
 <main id="main">
 ${content}
 </main>
-${footerBlock()}
+${footerBlock(hero)}
 <script src="${up}assets/js/counter.js" defer></script>
 </body>
 </html>
@@ -336,16 +374,34 @@ function renderIndex(posts) {
       author: { '@type': 'Person', name: site.author },
     })}</script>`,
     content,
+    hero: site.hero,
   });
+}
+
+/** 轉載聲明。有填 originalUrl 才會出現。 */
+function reprintNotice(post) {
+  if (!post.originalUrl) return '';
+  const site_ = post.originalSite || '原刊媒體';
+  const when = post.originalDate ? `，${escapeHtml(post.originalDate)}` : '';
+  return `
+          <aside class="reprint">
+            <p>
+              本文原刊於<strong>${escapeHtml(site_)}</strong>${when}，
+              作者為本站作者本人，經整理後同步發表於此。
+              <a href="${escapeHtml(post.originalUrl)}" rel="canonical noopener noreferrer" target="_blank">閱讀原文</a>。
+            </p>
+          </aside>`;
 }
 
 function renderPost(post) {
   const sameDay = fmtDate(post.published) === fmtDate(post.updated);
+  const hero = heroFor(post);
 
   const content = `${heroBlock({
     eyebrow: post.tags[0] || '長照機構營運管理',
     title: post.title,
     lede: post.summary,
+    hero,
   })}
       <div class="wrap">
         <article class="post">
@@ -361,6 +417,7 @@ function renderPost(post) {
             <span class="dot" aria-hidden="true">·</span>
             <span>瀏覽 <span data-views="${escapeHtml(post.slug)}" aria-busy="true">–</span></span>
           </p>
+${reprintNotice(post)}
           <div class="prose">
 ${post.html}
           </div>
@@ -382,8 +439,13 @@ ${post.html}
       datePublished: isoDate(post.published),
       dateModified: isoDate(post.updated),
       author: { '@type': 'Person', name: post.author },
+      ...(post.originalUrl
+        ? { isBasedOn: post.originalUrl, creditText: post.originalSite || undefined }
+        : {}),
     })}</script>`,
     content,
+    hero,
+    canonicalOverride: post.originalUrl || '',
   });
 }
 

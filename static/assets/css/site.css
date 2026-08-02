@@ -271,6 +271,22 @@ h1, h2, h3, h4 { line-height: 1.35; text-wrap: balance; }
   margin-bottom: 1.75rem;
 }
 
+/* 轉載聲明：明確、但不搶走內文的注意力 */
+.reprint {
+  margin: 0 0 1.75rem;
+  padding: .85rem 1.1rem;
+  background: var(--accent-soft);
+  border-left: 4px solid var(--accent);
+  border-radius: 0 10px 10px 0;
+}
+.reprint p {
+  margin: 0;
+  font-size: .86rem;
+  line-height: 1.75;
+  color: var(--text);
+}
+.reprint a { font-weight: 600; }
+
 .prose { font-size: 1.02rem; }
 .prose > :first-child { margin-top: 0; }
 
