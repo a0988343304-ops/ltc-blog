@@ -67,27 +67,45 @@ node serve.mjs
 ## 目錄結構
 
 ```
-content/posts/     文章原始 Markdown（唯一需要手動編輯的地方）
-static/            會原封不動複製到輸出目錄的檔案（CSS / JS / 圖片）
-build.mjs          靜態產生器
-site.config.json   站台設定：標題、作者、HERO 圖授權、Supabase 金鑰
-supabase/schema.sql 計數器資料表與函式
-docs/              建置輸出（GitHub Pages 與 Cloudflare Pages 都吃這個目錄）
+content/posts/       文章原始 Markdown（唯一需要手動編輯的地方）
+static/              會原封不動複製到輸出目錄的檔案（CSS / JS / 圖片）
+build.mjs            靜態產生器
+site.config.json     站台設定：標題、作者、HERO 圖授權、計數器 API
+functions/api/       Cloudflare Pages Functions（計數器 API）
+cloudflare/schema.sql D1 資料表結構
+wrangler.toml        Cloudflare Pages 與 D1 綁定設定
+docs/                建置輸出（GitHub Pages 與 Cloudflare Pages 都吃這個目錄）
 ```
 
 `docs/` 是產生出來的，但**有進版控**——GitHub Pages 需要直接讀到它。
 
 ## 瀏覽計數器
 
-用 Supabase 記錄每篇文章與首頁的瀏覽次數。
+每篇文章與首頁各有獨立計數，資料存在 **Cloudflare D1**，由 Pages Functions 提供 API。
 
-1. 到 Supabase SQL Editor 執行 `supabase/schema.sql`。
-2. 把專案的 Project URL 與 anon public key 填進 `site.config.json` 的 `supabase` 區塊。
-3. 重新 build。
+```
+GET  /api/views          → { "site-home": 12, "20260802-introduction": 5 }
+POST /api/views {slug}   → { slug, views }
+```
 
-anon key 是設計成公開放在前端的；真正的防線是 `schema.sql` 裡的 RLS 政策——匿名訪客只能讀取，寫入一律經過 `increment_view()` 函式，沒辦法把數字改成任意值。
+- 計數用 SQLite 的 `INSERT ... ON CONFLICT DO UPDATE` 一次完成，是原子操作，併發時不會掉數字。
+- `slug` 只接受 `[A-Za-z0-9_-]{1,128}`，其餘一律 400。
+- 同一個瀏覽器工作階段內同一頁只計一次，重新整理不灌水。
+- 首頁卡片上的數字是 JS 填進**既有的靜態 HTML 欄位**，不會生成卡片，列表的 SEO 不受影響。
 
-設定留空時計數器會安靜停用，網站其餘功能不受影響。
+資料表結構在 `cloudflare/schema.sql`，套用方式：
+
+```bash
+wrangler d1 execute ltc-blog-views --remote --file=./cloudflare/schema.sql
+```
+
+歸零重來：
+
+```bash
+wrangler d1 execute ltc-blog-views --remote --command "DELETE FROM page_views;"
+```
+
+`site.config.json` 的 `counter.apiBase` 留空時計數器會安靜停用，網站其餘功能不受影響。GitHub Pages 鏡像站因為沒有後端，是跨網域呼叫 Cloudflare 這支 API（CORS 白名單寫在 `functions/api/views.js`）。
 
 ## HERO 圖授權
 

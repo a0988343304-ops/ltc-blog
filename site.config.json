@@ -17,8 +17,7 @@
     "sourceUrl": "https://commons.wikimedia.org/wiki/File:2026.05.01_National_Center_for_Geriatrics_and_Welfare_Research,_NHRI_02.jpg",
     "modified": false
   },
-  "supabase": {
-    "url": "",
-    "anonKey": ""
+  "counter": {
+    "apiBase": "https://ltc-blog.pages.dev"
   }
 }

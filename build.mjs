@@ -185,7 +185,7 @@ function footerBlock(buildTime) {
 }
 
 function layout({ title, description, bodyClass, pageSlug, head = '', content }) {
-  const supa = site.supabase || {};
+  const counter = site.counter || {};
   const up = pageSlug === 'site-home' ? '' : '../';
 
   // 同一份內容會同時出現在 GitHub Pages 與 Cloudflare Pages 兩個網址，
@@ -213,7 +213,7 @@ ${canonical ? `<meta property="og:url" content="${escapeHtml(canonical)}" />\n<l
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='26' font-size='26'>🏥</text></svg>" />
 ${head}
 <script>
-  window.__SITE__ = { supabase: { url: ${JSON.stringify(supa.url || '')}, anonKey: ${JSON.stringify(supa.anonKey || '')} } };
+  window.__SITE__ = { counter: { apiBase: ${JSON.stringify(counter.apiBase || '')} } };
 </script>
 </head>
 <body class="${bodyClass}" data-page-slug="${escapeHtml(pageSlug)}">

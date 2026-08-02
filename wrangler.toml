@@ -1,0 +1,11 @@
+name = "ltc-blog"
+compatibility_date = "2026-08-01"
+
+# Pages 直接發布這個目錄（build.mjs 的輸出）
+pages_build_output_dir = "docs"
+
+# 瀏覽計數器的資料庫。functions/api/views.js 透過 env.DB 存取。
+[[d1_databases]]
+binding = "DB"
+database_name = "ltc-blog-views"
+database_id = "3ee450af-c6bf-4095-b827-9a2fce818080"
