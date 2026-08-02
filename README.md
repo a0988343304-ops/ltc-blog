@@ -64,6 +64,48 @@ node serve.mjs
 
 開 <http://localhost:4173>。
 
+## 部署
+
+推上 `main` 之後全自動，不需要手動做任何事：
+
+```
+git push
+   │
+   ├─→ GitHub Actions ─ npm ci → npm run build
+   │                    └─ docs/ 若與原始內容有落差就重建並推回
+   │                    └─ wrangler pages deploy → Cloudflare Pages
+   │
+   └─→ GitHub Pages ─ 直接供應 main 分支的 /docs
+```
+
+| 站台 | 網址 | 角色 |
+|---|---|---|
+| Cloudflare Pages | <https://ltc-blog.pages.dev> | 正式站，`canonical` 指向這裡 |
+| GitHub Pages | <https://a0988343304-ops.github.io/ltc-blog/> | 鏡像站 |
+
+兩邊掛同一份內容，所以每頁的 `canonical` 都指向 Cloudflare，避免搜尋引擎判定為重複內容而自行挑一個排名。
+
+### 需要的 secrets
+
+| 名稱 | 用途 |
+|---|---|
+| `CLOUDFLARE_ACCOUNT_ID` | Cloudflare 帳號 ID |
+| `CLOUDFLARE_API_TOKEN` | 權限只需 Cloudflare Pages:Edit 與 D1:Edit |
+
+更新 token（輸入不會顯示在畫面上）：
+
+```bash
+gh secret set CLOUDFLARE_API_TOKEN --repo a0988343304-ops/ltc-blog
+```
+
+### 手動部署
+
+CI 壞掉時的退路：
+
+```bash
+npm run build && wrangler pages deploy
+```
+
 ## 目錄結構
 
 ```
