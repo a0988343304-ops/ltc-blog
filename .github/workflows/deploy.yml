@@ -1,0 +1,43 @@
+name: Deploy to Cloudflare Pages
+
+# 推上 main 之後，自動把 docs/ 同步部署到 Cloudflare Pages。
+# GitHub Pages 由 GitHub 自己從 main 的 /docs 供應，不需要在這裡處理。
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pages-deploy
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # build.mjs 依 git 歷史推算文章的最後更新日期，需要完整歷史
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      # 重新建置一次，確保 docs/ 與 content/ 一致
+      # （若有人只改了 .md 卻忘記在本機 build）
+      - run: npm run build
+
+      - name: Deploy to Cloudflare Pages
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: pages deploy docs --project-name=ltc-blog --branch=main

@@ -186,6 +186,15 @@ function footerBlock(buildTime) {
 
 function layout({ title, description, bodyClass, pageSlug, head = '', content }) {
   const supa = site.supabase || {};
+  const up = pageSlug === 'site-home' ? '' : '../';
+
+  // 同一份內容會同時出現在 GitHub Pages 與 Cloudflare Pages 兩個網址，
+  // 用 canonical 指定 Cloudflare 這個正式網址，避免被判定為重複內容。
+  const origin = (site.siteUrl || '').replace(/\/+$/, '');
+  const canonical = origin
+    ? `${origin}/${pageSlug === 'site-home' ? '' : `${pageSlug}/`}`
+    : '';
+
   return `<!doctype html>
 <html lang="${escapeHtml(site.lang)}">
 <head>
@@ -199,7 +208,8 @@ function layout({ title, description, bodyClass, pageSlug, head = '', content })
 <meta property="og:title" content="${escapeHtml(title)}" />
 <meta property="og:description" content="${escapeHtml(description)}" />
 <meta property="og:locale" content="zh_TW" />
-<link rel="stylesheet" href="${pageSlug === 'site-home' ? '' : '../'}assets/css/site.css" />
+${canonical ? `<meta property="og:url" content="${escapeHtml(canonical)}" />\n<link rel="canonical" href="${escapeHtml(canonical)}" />` : ''}
+<link rel="stylesheet" href="${up}assets/css/site.css" />
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='26' font-size='26'>🏥</text></svg>" />
 ${head}
 <script>
@@ -210,7 +220,7 @@ ${head}
 <a class="skip" href="#main">跳到主要內容</a>
 <header class="topbar">
   <div class="wrap topbar__inner">
-    <a class="topbar__brand" href="${pageSlug === 'site-home' ? './' : '../'}">${escapeHtml(site.title)}</a>
+    <a class="topbar__brand" href="${up || './'}">${escapeHtml(site.title)}</a>
     <span class="topbar__views" title="全站瀏覽次數">
       本站瀏覽 <span data-views="site-home" aria-busy="true">–</span>
     </span>
@@ -220,7 +230,7 @@ ${head}
 ${content}
 </main>
 ${footerBlock(new Date())}
-<script src="${pageSlug === 'site-home' ? '' : '../'}assets/js/counter.js" defer></script>
+<script src="${up}assets/js/counter.js" defer></script>
 </body>
 </html>
 `;
