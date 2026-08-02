@@ -6,6 +6,11 @@ tags: 評鑑, 日間照顧, 流程管理
 originalSite: 創新照顧（侒可傳媒）
 originalUrl: https://www.ankecare.com/article/4571-2026-07-27-10-40-23
 originalDate: 2026-07-27
+heroImage: hero-event-to-service.webp
+heroWidth: 1600
+heroHeight: 800
+heroAlt: 左右對照圖：左側「事件中心」是散落傾斜的紙片，寫著臨時補件、反覆修改、資料前後不一致、追蹤斷點、同一份資料反覆多工；右側「服務中心」是編號一到五、整齊對齊並以連線串起的流程，依序為申請與照會、家屬參訪與訂約、服務執行與紀錄、核銷與收費、稽核與持續改善；下方列出五大工作情境。
+heroCredit: 本頁 HERO 圖為本站原創繪製（原始檔：assets-src/hero-event-to-service.svg），非原刊媒體之圖像。
 ---
 
 長照機構的評鑑準備與行政流程，長年來一直是機構經營管理上的重要課題。依據長期照顧服務機構評鑑辦法第 7 條第 3 項、第 4 項，以及長期照顧服務法第 39 條規定，主管機關必須對長照機構應予輔導、監督、考核、檢查及評鑑。評鑑作業的核心精神，旨在透過評鑑指標的把關，確保長照機構呈現符合規範的基礎品質標準。
@@ -53,8 +58,8 @@ originalDate: 2026-07-27
 <figure>
   <a href="../assets/img/flow-service-centered-accreditation.webp" target="_blank" rel="noopener noreferrer">
     <img src="../assets/img/flow-service-centered-accreditation.webp"
-         alt="社區式日間照顧機構以服務為中心的評鑑流程管理全圖：上半部依申請長照服務、家屬參訪、開始服務、核銷、政府作業的順序排列各項評鑑指標；下半部歸納為行政管理、照顧管理、人員管理、空間管理、社區連結、專業支持六大工作情境。"
-         width="1536" height="1024" loading="lazy" decoding="async" />
+         alt="社區式日間照顧機構以服務為中心的評鑑流程管理全圖。上半部依服務發生的順序排列：申請長照服務、家屬參訪、健康生活照顧、核銷、政府作業與無預警查核，並標出對應的評鑑指標代碼；左側列出個案與家屬、政府 A 個管、業務負責人、內部團隊人員等相關角色，右側列出外部廠商單位、單位周邊資源與跨專業服務人員。下半部歸納為行政經營管理、照顧品質監測、團隊建置運作、空間環境規劃、建構資源網絡五大工作情境，各自列出所屬指標。"
+         width="1200" height="800" loading="lazy" decoding="async" />
   </a>
   <figcaption>社區式日間照顧機構以「服務為中心」的評鑑流程管理——以 115 年度臺北市政府社會局日間照顧機構法定評鑑基準為例（圖片來源／顏和平）。點圖可放大。</figcaption>
 </figure>

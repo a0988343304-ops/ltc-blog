@@ -168,15 +168,21 @@ function heroFor(post) {
   };
 }
 
-/** HERO 區。圖片等比例縮放，寬度由 CSS 限制在內容文字區寬度之內。 */
-function heroBlock({ eyebrow, title, lede, hero }) {
+/**
+ * HERO 區。圖片等比例縮放，寬度由 CSS 限制在內容文字區寬度之內。
+ *
+ * up 是回到站台根目錄的相對前綴：首頁是 ''，文章頁是 '../'。
+ * 少了它，文章頁會去要 /<slug>/assets/img/... —— Cloudflare Pages 對這種
+ * 路徑會回 200 但內容是首頁 HTML，瀏覽器拿到 HTML 當圖片，靜靜地壞掉。
+ */
+function heroBlock({ eyebrow, title, lede, hero, up = '' }) {
   const h = hero || site.hero;
   return `
       <section class="hero">
         <figure class="hero__figure">
           <img
             class="hero__img"
-            src="${escapeHtml(h.src)}"
+            src="${escapeHtml(up + h.src)}"
             alt="${escapeHtml(h.alt)}"
             width="${h.width}"
             height="${h.height}"
@@ -402,6 +408,7 @@ function renderPost(post) {
     title: post.title,
     lede: post.summary,
     hero,
+    up: '../',
   })}
       <div class="wrap">
         <article class="post">
@@ -492,6 +499,59 @@ if (origin) {
 
 // GitHub Pages 預設會跑 Jekyll，會忽略底線開頭的檔案；停用它比較保險
 await writeFile(join(OUT_DIR, '.nojekyll'), '', 'utf8');
+
+/* ----------------------------------------------------- 產出後的自我檢查 --- */
+
+/**
+ * 檢查輸出的 HTML 裡每一個站內連結與資產，檔案是不是真的存在。
+ *
+ * 為什麼需要：文章頁在 /<slug>/ 底下，少寫 ../ 的相對路徑會指到
+ * /<slug>/assets/...。Cloudflare Pages 對這種路徑回的是 200 + 首頁 HTML，
+ * 不是 404 —— 瀏覽器拿到 HTML 當圖片，畫面靜靜地壞掉，沒有任何錯誤訊息。
+ * 與其等人肉眼發現，不如在這裡直接讓建置失敗。
+ */
+async function checkLocalRefs(dir, base = dir) {
+  const missing = [];
+
+  for (const entry of await readdir(dir, { withFileTypes: true })) {
+    const full = join(dir, entry.name);
+    if (entry.isDirectory()) {
+      missing.push(...(await checkLocalRefs(full, base)));
+      continue;
+    }
+    if (!entry.name.endsWith('.html')) continue;
+
+    const html = await readFile(full, 'utf8');
+    for (const m of html.matchAll(/(?:src|href)="([^"]+)"/g)) {
+      const ref = m[1];
+      // 外部連結、資料 URI、錨點、協定相對路徑都不歸這裡管
+      if (/^(https?:|data:|mailto:|tel:|#|\/\/)/.test(ref)) continue;
+
+      const clean = ref.split(/[?#]/)[0];
+      if (!clean) continue;
+
+      const target = clean.endsWith('/')
+        ? join(dirname(full), clean, 'index.html')
+        : join(dirname(full), clean);
+
+      if (!existsSync(target)) {
+        missing.push({
+          page: full.slice(base.length + 1).replace(/\\/g, '/'),
+          ref,
+        });
+      }
+    }
+  }
+  return missing;
+}
+
+const broken = await checkLocalRefs(OUT_DIR);
+if (broken.length) {
+  console.error(`\n✗ 有 ${broken.length} 個站內連結／資產找不到檔案：`);
+  for (const b of broken) console.error(`  ${b.page}  →  ${b.ref}`);
+  console.error('');
+  process.exit(1);
+}
 
 console.log(`✓ 產生 ${posts.length} 篇文章 + 首頁 → ${resolve(OUT_DIR)}`);
 for (const p of posts) {

@@ -141,8 +141,8 @@ h1, h2, h3, h4 { line-height: 1.35; text-wrap: balance; }
   width: 100%;
   max-width: var(--content);
   margin-inline: auto;
-  aspect-ratio: 1920 / 1240;
-  object-fit: cover;
+  /* 長寬比由 <img> 的 width/height 屬性決定，不寫死。
+     寫死會讓不同比例的文章專屬 HERO 圖被裁切。 */
   border-radius: var(--radius);
   box-shadow: var(--shadow);
   background: var(--border);
