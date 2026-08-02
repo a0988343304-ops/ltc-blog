@@ -1,0 +1,24 @@
+{
+  "title": "長照機構營運管理",
+  "tagline": "從人力、法規到日常流程，把機構經營的每一件事講清楚",
+  "description": "聚焦台灣長照機構的營運管理實務：人力配置、法規遵循、品質稽核、成本結構與日常流程改善。",
+  "author": "顏和平",
+  "lang": "zh-Hant-TW",
+  "siteUrl": "",
+  "hero": {
+    "src": "assets/img/hero-geriatrics-center.jpg",
+    "alt": "國家衛生研究院國家高齡醫學暨健康福祉研究中心的建築外觀與前方廣場",
+    "width": 1920,
+    "height": 1240,
+    "workTitle": "National Center for Geriatrics and Welfare Research, NHRI",
+    "creator": "中華民國總統府（攝影：Wang Yu Ching / Office of the President）",
+    "license": "CC BY 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by/4.0/",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:2026.05.01_National_Center_for_Geriatrics_and_Welfare_Research,_NHRI_02.jpg",
+    "modified": false
+  },
+  "supabase": {
+    "url": "",
+    "anonKey": ""
+  }
+}

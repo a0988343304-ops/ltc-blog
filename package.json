@@ -1,0 +1,14 @@
+{
+  "name": "ltc-blog",
+  "version": "1.0.0",
+  "private": true,
+  "description": "長照機構營運管理部落格（靜態產生器）",
+  "type": "module",
+  "scripts": {
+    "build": "node build.mjs",
+    "serve": "node --run build && node serve.mjs"
+  },
+  "dependencies": {
+    "marked": "^16.4.1"
+  }
+}
