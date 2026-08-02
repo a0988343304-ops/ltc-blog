@@ -160,8 +160,17 @@ function heroBlock({ eyebrow, title, lede }) {
       </section>`;
 }
 
+/**
+ * 內容最後更新時間（所有文章的最大值），在載入文章後填入。
+ *
+ * 刻意「不」用建置當下的時間：那會讓每次 build 的產物都不同，
+ * CI 於是每跑一次就把 docs/ 重新提交一次，本機永遠落後遠端。
+ * 這個時間本來就該反映內容有沒有變，而不是建置動作跑過幾次。
+ */
+let contentUpdated = null;
+
 /** 需求 3：CC BY 出處標示放在 footer。 */
-function footerBlock(buildTime) {
+function footerBlock() {
   const h = site.hero;
   return `
     <footer class="footer">
@@ -176,9 +185,13 @@ function footerBlock(buildTime) {
           </p>
         </section>
         <p class="footer__meta">
-          <span>© ${new Date().getFullYear()} ${escapeHtml(site.author)}</span>
-          <span class="dot" aria-hidden="true">·</span>
-          <span>網站最後更新 <time datetime="${buildTime.toISOString()}">${fmtDateTime(buildTime)}</time></span>
+          <span>© ${contentUpdated ? contentUpdated.getFullYear() : new Date().getFullYear()} ${escapeHtml(site.author)}</span>
+          ${
+            contentUpdated
+              ? `<span class="dot" aria-hidden="true">·</span>
+          <span>內容最後更新 <time datetime="${isoDate(contentUpdated)}">${fmtDate(contentUpdated)}</time></span>`
+              : ''
+          }
         </p>
       </div>
     </footer>`;
@@ -229,7 +242,7 @@ ${head}
 <main id="main">
 ${content}
 </main>
-${footerBlock(new Date())}
+${footerBlock()}
 <script src="${up}assets/js/counter.js" defer></script>
 </body>
 </html>
@@ -277,9 +290,7 @@ ${posts
 }
 
 function renderIndex(posts) {
-  const newest = posts.length
-    ? posts.reduce((a, p) => (p.updated > a ? p.updated : a), posts[0].updated)
-    : new Date();
+  const newest = contentUpdated;
 
   const content = `${heroBlock({
     eyebrow: '長照機構經營筆記',
@@ -291,9 +302,13 @@ function renderIndex(posts) {
           <div class="listing__head">
             <h2>全部文章</h2>
             <p class="listing__meta">
-              共 ${posts.length} 篇
+              共 ${posts.length} 篇${
+                newest
+                  ? `
               <span class="dot" aria-hidden="true">·</span>
-              內容最後更新 <time datetime="${isoDate(newest)}">${fmtDate(newest)}</time>
+              內容最後更新 <time datetime="${isoDate(newest)}">${fmtDate(newest)}</time>`
+                  : ''
+              }
             </p>
           </div>
           ${cardsBlock(posts)}
@@ -368,6 +383,10 @@ ${post.html}
 /* --------------------------------------------------------------- 建置 --- */
 
 const posts = await loadPosts();
+
+contentUpdated = posts.length
+  ? posts.reduce((a, p) => (p.updated > a ? p.updated : a), posts[0].updated)
+  : null;
 
 await rm(OUT_DIR, { recursive: true, force: true });
 await mkdir(OUT_DIR, { recursive: true });
