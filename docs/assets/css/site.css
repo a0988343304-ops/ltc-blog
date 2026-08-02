@@ -15,8 +15,8 @@
   --border: #e2e8f0;
   --text: #1a2433;
   --text-muted: #5b6b80;
-  /* 標題色。#123a6b 對白底 11.36:1、對 --bg-soft 10.55:1，遠高於 AA 的 4.5:1。 */
-  --heading: #123a6b;
+  /* 標題色。#0f5132 對 --bg-soft 是 8.47:1，遠高於 AA 的 4.5:1。 */
+  --heading: #0f5132;
   --accent: #0f6f5c;
   --accent-soft: #e6f4f0;
   /* 放在 --accent 上的前景色。淺色模式 #ffffff 對 #0f6f5c 是 6.09:1（AA 通過）。 */
@@ -33,9 +33,10 @@
     --border: #26313f;
     --text: #e6ecf3;
     --text-muted: #9bacc0;
-    /* 深色模式不能用深藍——#123a6b 對深底只有 1.4:1，等於看不見。
-       改用同色相的淺藍 #9dc2f0，對 --bg-soft 是 9.4:1。 */
-    --heading: #9dc2f0;
+    /* 深色模式不能用深綠——#0f5132 對深底只有 1.6:1，等於看不見。
+       改用同色相的淺綠 #8ed7b8（對 --bg-soft 10.45:1），
+       並刻意與連結色 --accent #5ecbb0 拉開，避免標題看起來像連結。 */
+    --heading: #8ed7b8;
     --accent: #5ecbb0;
     --accent-soft: #14312a;
     /* 深色模式的 --accent 是淺薄荷綠，白字只有 1.97:1（遠低於 AA 的 4.5:1）。
