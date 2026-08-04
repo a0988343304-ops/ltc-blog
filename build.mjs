@@ -356,30 +356,38 @@ let contentUpdated = null;
  * CC BY 的授權聲明，那會變成錯誤標示。
  */
 function footerBlock(hero) {
-  const h = hero || site.hero;
+  // hero 傳 null＝這一頁沒有主圖（關於我、聯絡方式⋯），
+  // 就整段不輸出圖片出處。沒有圖卻掛出處是錯誤標示。
+  let creditSection = '';
 
-  // 文件宣告 lang="zh-Hant-TW"，英文片段要各自標 lang="en"，
-  // 否則螢幕閱讀器會用中文語音引擎去唸英文（WCAG 3.1.2）。
-  const creator = h.creatorEn
-    ? `${escapeHtml(h.creator)}（攝影：<span lang="en">${escapeHtml(h.creatorEn)}</span>）`
-    : escapeHtml(h.creator);
+  if (hero) {
+    const h = hero;
 
-  const creditBody = h.license
-    ? `本頁 HERO 圖：<cite lang="en">${escapeHtml(h.workTitle)}</cite>，
+    // 文件宣告 lang="zh-Hant-TW"，英文片段要各自標 lang="en"，
+    // 否則螢幕閱讀器會用中文語音引擎去唸英文（WCAG 3.1.2）。
+    const creator = h.creatorEn
+      ? `${escapeHtml(h.creator)}（攝影：<span lang="en">${escapeHtml(h.creatorEn)}</span>）`
+      : escapeHtml(h.creator);
+
+    const creditBody = h.license
+      ? `本頁 HERO 圖：<cite lang="en">${escapeHtml(h.workTitle)}</cite>，
             作者 ${creator}，
             取自 <a href="${escapeHtml(h.sourceUrl)}" lang="en" rel="license noopener noreferrer" target="_blank" aria-describedby="newtab-note">Wikimedia Commons</a>，
             依 <a href="${escapeHtml(h.licenseUrl)}" lang="en" rel="license noopener noreferrer" target="_blank" aria-describedby="newtab-note">${escapeHtml(h.license)}</a> 授權使用${h.modified ? '，本站已裁切調整' : '，未經修改'}。`
-    : escapeHtml(h.credit || '本頁 HERO 圖由本站作者製作。');
+      : escapeHtml(h.credit || '本頁 HERO 圖由本站作者製作。');
 
-  return `
-    <footer class="footer">
-      <div class="wrap">
+    creditSection = `
         <section class="credit">
           <h2 class="credit__head">圖片出處</h2>
           <p class="credit__body">
             ${creditBody}
           </p>
-        </section>
+        </section>`;
+  }
+
+  return `
+    <footer class="footer">
+      <div class="wrap">${creditSection}
         <p class="footer__meta">
           <span>© ${contentUpdated ? contentUpdated.getFullYear() : new Date().getFullYear()} ${escapeHtml(site.author)}</span>
           ${
@@ -462,7 +470,7 @@ ${head}
 <header class="topbar">
   <div class="wrap topbar__inner">
     <a class="topbar__brand" href="${up || './'}">${escapeHtml(site.title)}</a>
-    ${navBlock(up)}
+    ${navBlock(up, pageSlug)}
     <span class="topbar__views">
       <span class="sr-only">全站累計</span>本站瀏覽 ${viewsSlot('site-home')}
     </span>
@@ -481,7 +489,9 @@ ${footerBlock(hero)}
 /* ------------------------------------------------------- 首頁與文章頁 --- */
 
 /** 需求 6：卡片是產生階段就寫進 HTML 的靜態內容。 */
-function cardsBlock(posts) {
+// titleLevel：卡片上方有 h2（首頁的「最新文章」）時用 3；
+// 沒有的話（/articles/ 只有 h1）要用 2，否則從 h1 跳到 h3。
+function cardsBlock(posts, up = '', titleLevel = 3) {
   if (!posts.length) {
     return '<p class="empty">目前還沒有文章。在 <code>content/posts/</code> 放一個 .md 檔，重新 build 就會出現在這裡。</p>';
   }
@@ -492,19 +502,19 @@ ${posts
     const sameDay = fmtDate(p.published) === fmtDate(p.updated);
     const h = heroFor(p);
 
-    // 卡片縮圖。首頁在站台根目錄，所以路徑不需要 ../ 前綴。
+    // 卡片縮圖。up 是回站台根目錄的前綴：首頁 ''、/articles/ 是 '../'。
     const thumbWidths = h.srcsetWidths || site.hero?.srcsetWidths;
     const thumbStem = String(h.src).replace(/\.[^./]+$/, '');
     const thumbSrcset = Array.isArray(thumbWidths) && thumbWidths.length
-      ? escapeHtml(thumbWidths.map((w) => `${assetVer(`${thumbStem}-${w}.webp`)} ${w}w`).join(', '))
+      ? escapeHtml(thumbWidths.map((w) => `${assetVer(`${up}${thumbStem}-${w}.webp`)} ${w}w`).join(', '))
       : '';
 
     // alt 留空：縮圖對這張卡而言是裝飾，內容由緊接著的標題承載。
     // 放 alt 會讓螢幕閱讀器在每個標題前先念一整段圖片描述。
     // 連結重複指向同一篇，用 tabindex="-1" + aria-hidden 避免多一個 Tab 停留點。
-    const thumb = `<a class="card__thumb" href="${escapeHtml(p.slug)}/" tabindex="-1" aria-hidden="true">
+    const thumb = `<a class="card__thumb" href="${escapeHtml(up + p.slug)}/" tabindex="-1" aria-hidden="true">
               <img
-                src="${escapeHtml(assetVer(h.src))}"${thumbSrcset ? `
+                src="${escapeHtml(assetVer(up + h.src))}"${thumbSrcset ? `
                 srcset="${thumbSrcset}"
                 sizes="(max-width: 46rem) calc(100vw - 4rem), 27rem"` : ''}
                 alt=""
@@ -518,7 +528,7 @@ ${posts
     return `        <li class="card">
           <article>
             ${thumb}
-            <h3 class="card__title"><a href="${escapeHtml(p.slug)}/">${escapeHtml(p.title)}</a></h3>
+            <h${titleLevel} class="card__title"><a href="${escapeHtml(up + p.slug)}/">${escapeHtml(p.title)}</a></h${titleLevel}>
             ${p.summary ? `<p class="card__summary">${escapeHtml(p.summary)}</p>` : ''}
             ${
               p.tags.length
@@ -590,37 +600,47 @@ function profileBlock() {
 }
 
 /**
- * 頁首的區塊導覽。
- * 首頁用純錨點（#about），文章頁要先回首頁再跳（../#about）。
+ * 頁首導覽。每一項都是獨立頁面（/about/、/services/⋯），不是錨點。
+ * up 是回站台根目錄的相對前綴：首頁 ''、其餘頁面 '../'。
+ * 目前所在的那一頁標成 aria-current="page"。
  */
-function navBlock(up) {
+function navBlock(up, currentSlug) {
   const items = site.nav;
   if (!Array.isArray(items) || !items.length) return '';
 
-  return `<nav class="topnav" aria-label="頁面區塊">
+  return `<nav class="topnav" aria-label="主要導覽">
       <ul>
 ${items
-  .map(
-    (n) => `        <li><a href="${up}#${escapeHtml(n.id)}">${escapeHtml(n.label)}</a></li>`,
-  )
+  .map((n) => {
+    const here = n.id === currentSlug;
+    return `        <li><a href="${up}${escapeHtml(n.id)}/"${here ? ' aria-current="page"' : ''}>${escapeHtml(n.label)}</a></li>`;
+  })
   .join('\n')}
       </ul>
     </nav>`;
 }
 
-/** 卡片式區塊（關於我、我的服務）。內容全部來自 site.config.json。 */
+/**
+ * 卡片式區塊（關於我、我的服務）。內容全部來自 site.config.json。
+ * heading 傳空字串就不輸出標題——首頁用得到：那裡只要三張卡，
+ * 不需要再壓一個「關於我」大標把版面撐開。
+ */
 function cardSection(id, heading, items) {
   if (!Array.isArray(items) || !items.length) return '';
+
+  // 沒有區塊標題時，卡片標題要升到 h2，否則會從 h1 直接跳到 h3。
+  // 跳階會讓螢幕閱讀器的標題導覽出現斷層，也是 SEO 檢測的扣分項。
+  const lvl = heading ? 3 : 2;
 
   return `
       <section class="section" id="${escapeHtml(id)}">
         <div class="wrap">
-          <h2 class="section__head">${escapeHtml(heading)}</h2>
+          ${heading ? `<h2 class="section__head">${escapeHtml(heading)}</h2>` : ''}
           <ul class="tiles">
 ${items
   .map(
     (w) => `            <li class="tile">
-              <h3 class="tile__title">${escapeHtml(w.title)}</h3>
+              <h${lvl} class="tile__title">${escapeHtml(w.title)}</h${lvl}>
               ${w.detail ? `<p class="tile__detail">${escapeHtml(w.detail)}</p>` : ''}
             </li>`,
   )
@@ -635,8 +655,9 @@ ${items
  * 刻意在沒有資料時輸出「待補」而不是編一個看起來合理的數字——
  * 這一區會被潛在客戶與公部門當成事實查看，寧可空著也不能捏造。
  */
-function resultsBlock() {
+function resultsBlock(heading = '') {
   const items = site.results;
+  const lvl = heading ? 3 : 2;   // 同理，避免 h1 -> h3 跳階
 
   const body = Array.isArray(items) && items.length
     ? `<ul class="results">
@@ -644,7 +665,7 @@ ${items
   .map(
     (r) => `            <li class="result">
               ${r.metric ? `<p class="result__metric">${escapeHtml(r.metric)}</p>` : ''}
-              ${r.title ? `<h3 class="result__title">${escapeHtml(r.title)}</h3>` : ''}
+              ${r.title ? `<h${lvl} class="result__title">${escapeHtml(r.title)}</h${lvl}>` : ''}
               ${r.detail ? `<p class="result__detail">${escapeHtml(r.detail)}</p>` : ''}
               ${r.quote ? `<blockquote class="result__quote"><p>${escapeHtml(r.quote)}</p>${r.source ? `<footer>— ${escapeHtml(r.source)}</footer>` : ''}</blockquote>` : ''}
             </li>`,
@@ -656,14 +677,14 @@ ${items
   return `
       <section class="section" id="results">
         <div class="wrap">
-          <h2 class="section__head">合作成果</h2>
+          ${heading ? `<h2 class="section__head">${escapeHtml(heading)}</h2>` : ''}
           ${body}
         </div>
       </section>`;
 }
 
 /** 聯絡方式。同樣不編造——沒填就顯示待補。 */
-function contactBlock() {
+function contactBlock(heading = '') {
   const c = site.contact || {};
   const items = Array.isArray(c.items) ? c.items : [];
 
@@ -685,7 +706,7 @@ ${items
   return `
       <section class="section section--contact" id="contact">
         <div class="wrap">
-          <h2 class="section__head">聯絡方式</h2>
+          ${heading ? `<h2 class="section__head">${escapeHtml(heading)}</h2>` : ''}
           ${c.intro ? `<p class="section__lede">${escapeHtml(c.intro)}</p>` : ''}
           ${body}
         </div>
@@ -695,15 +716,15 @@ ${items
 function renderIndex(posts) {
   const newest = contentUpdated;
 
-  const content = `${profileBlock()}${cardSection('about', '關於我', site.about)}${cardSection(
-    'services',
-    '我的服務',
-    site.services,
-  )}${resultsBlock()}${contactBlock()}
+  // 首頁只留核心：宣言、照片、三項專業定位、最近幾篇。
+  // 其餘四個區塊各自是獨立頁面，由頁首導覽進入。
+  const latest = posts.slice(0, Number(site.homeLatestCount) || 4);
+
+  const content = `${profileBlock()}${cardSection('about', '', site.about)}
       <div class="wrap">
         <section class="listing">
           <div class="listing__head">
-            <h2>全部文章</h2>
+            <h2>最新文章</h2>
             <p class="listing__meta">
               共 ${posts.length} 篇${
                 newest
@@ -714,7 +735,12 @@ function renderIndex(posts) {
               }
             </p>
           </div>
-          ${cardsBlock(posts)}
+          ${cardsBlock(latest)}
+          ${
+            posts.length > latest.length
+              ? `<p class="listing__more"><a href="articles/">查看全部 ${posts.length} 篇文章 →</a></p>`
+              : ''
+          }
         </section>
       </div>`;
 
@@ -770,6 +796,88 @@ function renderIndex(posts) {
  * （或 HTTP Link 標頭）上有定義，放在 <a> 上爬蟲不會處理，只是噪音，
  * 還會讓維護者以為 canonical 是靠它生效。真正的 canonical 在 <head>。
  */
+/**
+ * 獨立頁面（關於我／我的服務／合作成果／聯絡方式／文章）。
+ *
+ * 這些頁面沒有主圖，所以 hero 傳 null，footer 就不會掛圖片出處。
+ * 頁面標題用 h1，底下的區塊一律不再重複輸出標題。
+ */
+function renderStandalone({ slug, label, description, lede = '', body }) {
+  const content = `
+      <section class="page-head">
+        <div class="wrap">
+          <h1 class="page-head__title">${escapeHtml(label)}</h1>
+          ${lede ? `<p class="page-head__lede">${escapeHtml(lede)}</p>` : ''}
+        </div>
+      </section>
+${body}`;
+
+  return layout({
+    title: `${label}｜${site.title}`,
+    description,
+    bodyClass: 'page-standalone',
+    pageSlug: slug,
+    head: `<script type="application/ld+json">${JSON.stringify({
+      '@context': 'https://schema.org',
+      '@type': 'WebPage',
+      name: label,
+      description,
+      inLanguage: 'zh-Hant-TW',
+      ...(origin ? { url: `${origin}/${slug}/` } : {}),
+      about: { '@type': 'Person', name: site.author },
+    })}</script>`,
+    content,
+    hero: null,
+  });
+}
+
+/** 全部文章索引。首頁只放最近幾篇，其餘從這裡進入。 */
+function renderArticles(posts) {
+  return renderStandalone({
+    slug: 'articles',
+    label: '文章',
+    description: `${site.title}的全部文章，共 ${posts.length} 篇。`,
+    lede: `共 ${posts.length} 篇${contentUpdated ? `，內容最後更新 ${fmtDate(contentUpdated)}` : ''}。`,
+    body: `
+      <div class="wrap">
+        <section class="listing">
+          ${cardsBlock(posts, '../', 2)}
+        </section>
+      </div>`,
+  });
+}
+
+/** 四個獨立頁面的定義。內容全部來自 site.config.json。 */
+function standalonePages() {
+  const names = (arr) => (Array.isArray(arr) ? arr.map((a) => a.title).join('、') : '');
+  return [
+    {
+      slug: 'about',
+      label: '關於我',
+      description: `${site.author}的專業背景：${names(site.about)}。`,
+      body: cardSection('about', '', site.about),
+    },
+    {
+      slug: 'services',
+      label: '我的服務',
+      description: `提供${names(site.services)}等服務。`,
+      body: cardSection('services', '', site.services),
+    },
+    {
+      slug: 'results',
+      label: '合作成果',
+      description: '輔導過的機構、改善的流程與合作單位回饋。',
+      body: resultsBlock(),
+    },
+    {
+      slug: 'contact',
+      label: '聯絡方式',
+      description: `與${site.author}聯繫，洽談評鑑輔導、營運管理與教育訓練合作。`,
+      body: contactBlock(),
+    },
+  ];
+}
+
 function reprintNotice(post) {
   if (!post.originalUrl) return '';
   const site_ = post.originalSite || '原刊媒體';
@@ -958,6 +1066,23 @@ await cp(STATIC_DIR, OUT_DIR, { recursive: true });
 await writeFile(join(OUT_DIR, 'index.html'), renderIndex(posts), 'utf8');
 await writeFile(join(OUT_DIR, '404.html'), renderNotFound(), 'utf8');
 
+// 四個獨立頁面 + 全部文章索引
+const pages = [...standalonePages(), {
+  slug: 'articles',
+  label: '文章',
+  html: renderArticles(posts),
+}];
+
+for (const page of pages) {
+  const dir = join(OUT_DIR, page.slug);
+  await mkdir(dir, { recursive: true });
+  await writeFile(
+    join(dir, 'index.html'),
+    page.html || renderStandalone(page),
+    'utf8',
+  );
+}
+
 for (const post of posts) {
   const dir = join(OUT_DIR, post.slug);
   await mkdir(dir, { recursive: true });
@@ -970,6 +1095,12 @@ if (origin) {
     // 首頁的 lastmod 要反映「所有文章的最新更新時間」。
     // posts[0] 只是發布日最新的那篇，不見得是最後被改動的那篇。
     { loc: `${origin}/`, lastmod: isoDate(contentUpdated || new Date()) },
+    // 四個獨立頁面與文章索引：內容來自 site.config.json，
+    // 沒有各自的異動時間，統一用站台內容的最後更新時間。
+    ...pages.map((p) => ({
+      loc: `${origin}/${p.slug}/`,
+      lastmod: isoDate(contentUpdated || new Date()),
+    })),
     // canonical 指向站外的轉載文不進 sitemap：一邊說「正本在別人家」、
     // 一邊請 Google 索引自己這一份，只會換來「重複網頁」的排除項。
     ...posts

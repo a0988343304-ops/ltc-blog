@@ -334,6 +334,28 @@ h1, h2, h3, h4 {
   color: var(--text);
 }
 
+/* --------------------------------------------------- 獨立頁面的頁首 --- */
+
+.page-head { padding-block: clamp(2rem, 6vw, 3.25rem) 0; }
+
+.page-head__title {
+  margin: 0;
+  font-size: clamp(1.6rem, 5vw, 2.2rem);
+}
+
+.page-head__lede {
+  margin: .8rem 0 0;
+  color: var(--text-muted);
+  font-size: .95rem;
+}
+
+.listing__more {
+  margin: clamp(1.5rem, 4vw, 2rem) 0 0;
+  text-align: center;
+  font-size: .95rem;
+  font-weight: 600;
+}
+
 /* ------------------------------------------------------- 首頁：區塊 --- */
 
 /* 留白優先：區塊之間拉開距離，比塞滿資訊更像專業服務網站 */

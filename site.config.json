@@ -35,8 +35,11 @@
     { "id": "about", "label": "關於我" },
     { "id": "services", "label": "我的服務" },
     { "id": "results", "label": "合作成果" },
-    { "id": "contact", "label": "聯絡方式" }
+    { "id": "contact", "label": "聯絡方式" },
+    { "id": "articles", "label": "文章" }
   ],
+
+  "homeLatestCount": 4,
 
   "about": [
     {
