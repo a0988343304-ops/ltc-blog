@@ -625,7 +625,7 @@ ${items
  * heading 傳空字串就不輸出標題——首頁用得到：那裡只要三張卡，
  * 不需要再壓一個「關於我」大標把版面撐開。
  */
-function cardSection(id, heading, items) {
+function cardSection(id, heading, items, { center = false } = {}) {
   if (!Array.isArray(items) || !items.length) return '';
 
   // 沒有區塊標題時，卡片標題要升到 h2，否則會從 h1 直接跳到 h3。
@@ -635,7 +635,7 @@ function cardSection(id, heading, items) {
   return `
       <section class="section" id="${escapeHtml(id)}">
         <div class="wrap">
-          ${heading ? `<h2 class="section__head">${escapeHtml(heading)}</h2>` : ''}
+          ${heading ? `<h2 class="section__head${center ? ' section__head--center' : ''}">${escapeHtml(heading)}</h2>` : ''}
           <ul class="tiles">
 ${items
   .map(
@@ -881,8 +881,8 @@ function journeyBlock() {
   return `
       <section class="section journey">
         <div class="wrap">
-          <h2 class="section__head">${escapeHtml(j.heading || '我的長照旅程')}</h2>
-          ${j.lede ? `<p class="section__lede">${escapeHtml(j.lede)}</p>` : ''}
+          <h2 class="section__head section__head--center">${escapeHtml(j.heading || '我的長照旅程')}</h2>
+          ${j.lede ? `<p class="section__lede section__lede--center">${escapeHtml(j.lede)}</p>` : ''}
           <ol class="journey__list">
 ${j.steps
   .map(
@@ -903,19 +903,62 @@ ${j.steps
       </section>`;
 }
 
-/** 「關於我」的敘事段落 ＋ 使命宣言。 */
-function storyBlock() {
+/**
+ * 「關於我」的敘事段落 ＋ 形象照 ＋ 使命宣言。
+ *
+ * 敘事文字寬度壓在 42rem（超過就難讀），右側原本是空白，
+ * 拿來放形象照剛好，版面也不會左重右輕。
+ *
+ * 使命宣言用逐行輸出而非讓它自然斷行：句子在「知識；」之後換行才順，
+ * 交給瀏覽器斷會斷在不該斷的地方。
+ */
+function storyBlock(up = '../') {
   const s = site.aboutStory;
   if (!s) return '';
 
+  const p = site.profile || {};
+  const photo = p.photo
+    ? `<figure class="story__figure">
+              <img
+                class="story__photo"
+                src="${escapeHtml(assetVer(up + p.photo))}"${
+                  p.photoSmall
+                    ? `
+                srcset="${escapeHtml(assetVer(up + p.photoSmall))} 280w, ${escapeHtml(assetVer(up + p.photo))} ${Number(p.photoSize) || 560}w"
+                sizes="(max-width: 52rem) 60vw, 18rem"`
+                    : ''
+                }
+                alt="${escapeHtml(p.photoAlt || p.name || '')}"
+                width="${Number(p.photoSize) || 560}"
+                height="${Number(p.photoSize) || 560}"
+                decoding="async"
+              />
+            </figure>`
+    : '';
+
+  const lines = Array.isArray(s.missionLines)
+    ? s.missionLines
+    : s.mission
+      ? [s.mission]
+      : [];
+
   return `
       <section class="section story">
-        <div class="wrap">
+        <div class="wrap story__inner">
           <div class="story__body">
 ${(s.paragraphs || []).map((t) => `            <p>${escapeHtml(t)}</p>`).join('\n')}
           </div>
-          ${s.mission ? `<p class="story__mission">${escapeHtml(s.mission)}</p>` : ''}
+          ${photo}
         </div>
+        ${
+          lines.length
+            ? `<div class="wrap">
+          <p class="story__mission">
+${lines.map((t) => `            <span>${escapeHtml(t)}</span>`).join('\n')}
+          </p>
+        </div>`
+            : ''
+        }
       </section>`;
 }
 
@@ -927,7 +970,7 @@ function standalonePages() {
       slug: 'about',
       label: '關於我',
       description: `${site.author}：長照機構營運與評鑑顧問、社工教師。從照顧服務員、社工到機構主任，現就讀東海大學社工博士班。`,
-      body: `${storyBlock()}${journeyBlock()}${cardSection('about', '專業定位', site.about)}`,
+      body: `${storyBlock()}${journeyBlock()}${cardSection('about', '專業定位', site.about, { center: true })}`,
     },
     {
       slug: 'services',

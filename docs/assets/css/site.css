@@ -385,6 +385,11 @@ h1, h2, h3, h4 {
   font-size: .95rem;
 }
 
+/* 置中版本：標題底下那道短線也要跟著置中，否則會歪在左邊 */
+.section__head--center { text-align: center; }
+.section__head--center::after { margin-inline: auto; }
+.section__lede--center { text-align: center; }
+
 .section__head + .tiles,
 .section__head + .results,
 .section__head + .placeholder { margin-top: 1.75rem; }
@@ -426,6 +431,18 @@ h1, h2, h3, h4 {
 
 /* ------------------------------------------------------ 關於我：故事 --- */
 
+/* 文字在左、形象照在右。窄螢幕改成上下排。 */
+.story__inner {
+  display: grid;
+  gap: clamp(1.75rem, 4vw, 3rem);
+  grid-template-columns: 1fr;
+  align-items: start;
+}
+
+@media (min-width: 52rem) {
+  .story__inner { grid-template-columns: minmax(0, 1fr) 18rem; }
+}
+
 .story__body {
   max-width: var(--content);
   font-size: clamp(1rem, 2.6vw, 1.08rem);
@@ -433,6 +450,23 @@ h1, h2, h3, h4 {
 }
 .story__body p { margin: 0 0 1.4rem; }
 .story__body p:last-child { margin-bottom: 0; }
+
+.story__figure {
+  margin: 0;
+  justify-self: center;       /* 窄螢幕置中，桌機靠右欄自然對齊 */
+  max-width: 18rem;
+  width: 100%;
+}
+
+.story__photo {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 1;
+  object-fit: cover;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  background: var(--border);
+}
 
 .story__mission {
   max-width: var(--content);
@@ -444,6 +478,10 @@ h1, h2, h3, h4 {
   line-height: 1.9;
   color: var(--heading);
 }
+
+/* 逐行輸出：句子要在「知識；」之後斷，交給瀏覽器會斷在不該斷的位置。
+   窄到放不下時仍允許該行自己折，不會硬撐出水平捲動。 */
+.story__mission span { display: block; }
 
 /* ----------------------------------------------------- 品牌時間軸 --- */
 
