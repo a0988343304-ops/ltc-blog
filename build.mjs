@@ -560,7 +560,7 @@ ${footerBlock(hero, up)}
 <script src="${ver(`${up}assets/js/counter.js`)}" defer></script>
 ${pageSlug === 'results' ? `<script src="${ver(`${up}assets/js/stats.js`)}" defer></script>` : ''}
 ${pageSlug === 'contact' ? `<script src="${ver(`${up}assets/js/email.js`)}" defer></script>` : ''}
-${bodyClass === 'page-post' ? `<script src="${ver(`${up}assets/js/share.js`)}" defer></script>` : ''}
+${bodyClass === 'page-post' || bodyClass === 'page-home' ? `<script src="${ver(`${up}assets/js/share.js`)}" defer></script>` : ''}
 </body>
 </html>
 `;
@@ -684,6 +684,7 @@ function profileBlock() {
             ${p.field ? `<p class="profile__tagline">${clauses(p.field)}</p>` : ''}
             ${p.role ? `<p class="profile__role">${escapeHtml(p.role)}</p>` : ''}
             ${p.positioning ? `<p class="profile__lede">${markEn(escapeHtml(p.positioning))}</p>` : ''}
+${shareBlock({ url: `${origin}/`, title: site.title, variant: 'profile' })}
           </div>
         </div>
       </section>`;
@@ -1557,12 +1558,11 @@ function standalonePages() {
  * 「複製連結」必須有 JS 才有作用，所以預設 hidden，由 share.js 打開；
  * 沒有 JS 的訪客不會看到一顆按了沒反應的按鈕。
  */
-function shareBlock(post, { compact = false } = {}) {
-  if (!origin) return '';
+function shareBlock({ url, title, compact = false, variant = '' } = {}) {
+  if (!origin || !url) return '';
 
-  const url = `${origin}/${post.slug}/`;
   const u = encodeURIComponent(url);
-  const t = encodeURIComponent(post.title);
+  const t = encodeURIComponent(title || '');
 
   const icon = (paths) =>
     `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">${paths}</svg>`;
@@ -1584,7 +1584,7 @@ function shareBlock(post, { compact = false } = {}) {
   const text = (t2) => (compact ? '' : `<span>${escapeHtml(t2)}</span>`);
 
   return `
-          <div class="share${compact ? ' share--compact' : ''}">
+          <div class="share${compact ? ' share--compact' : ''}${variant ? ` share--${variant}` : ''}">
             ${compact ? '<span class="sr-only">分享這篇</span>' : '<span class="share__label">分享這篇</span>'}
             <button type="button" class="share__btn" data-share-url="${escapeHtml(url)}"${label('複製連結')} hidden>
               ${clip}${text('複製連結')}
@@ -1673,13 +1673,13 @@ function renderPost(post, posts) {
               <span class="dot" aria-hidden="true">·</span>
               <span>瀏覽 ${viewsSlot(post.slug)}</span>
             </p>
-${shareBlock(post, { compact: true })}
+${shareBlock({ url: `${origin}/${post.slug}/`, title: post.title, compact: true })}
           </div>
 ${reprintNotice(post)}
           <div class="prose">
 ${post.html}
           </div>
-${shareBlock(post)}
+${shareBlock({ url: `${origin}/${post.slug}/`, title: post.title })}
 ${otherPostsBlock(post, posts)}
           <p class="post__back"><a href="../articles/"><span aria-hidden="true">←</span> 回到文章列表</a></p>
         </article>

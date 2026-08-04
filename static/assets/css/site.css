@@ -1360,8 +1360,23 @@ h1, h2, h3, h4 {
   margin-bottom: 0;
 }
 
+/* 首頁版：接在定位句下方，沒有上分隔線；
+   窄螢幕時 .profile__inner 是置中排版，分享列要跟著置中。 */
+/* 用 .share.share--profile 提高權重：修飾規則寫在基底 .share 之前，
+   同權重時後者會贏，border-top 會被基底的 1px 蓋回去。 */
+.share.share--profile {
+  margin: clamp(1.5rem, 4vw, 2rem) 0 0;
+  padding-top: 0;
+  border-top: 0;
+  justify-content: center;
+}
+
+@media (min-width: 46rem) {
+  .share.share--profile { justify-content: flex-start; }
+}
+
 /* 精簡版：只有圖示，可及名稱由 aria-label 提供 */
-.share--compact {
+.share.share--compact {
   margin: 0;
   padding-top: 0;
   border-top: 0;
