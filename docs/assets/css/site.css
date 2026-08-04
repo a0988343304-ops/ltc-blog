@@ -424,6 +424,128 @@ h1, h2, h3, h4 {
   color: var(--text-muted);
 }
 
+/* ------------------------------------------------------ 關於我：故事 --- */
+
+.story__body {
+  max-width: var(--content);
+  font-size: clamp(1rem, 2.6vw, 1.08rem);
+  line-height: 2.05;          /* 敘事文字放寬行距，讀起來比較不緊 */
+}
+.story__body p { margin: 0 0 1.4rem; }
+.story__body p:last-child { margin-bottom: 0; }
+
+.story__mission {
+  max-width: var(--content);
+  margin: clamp(2rem, 5vw, 2.75rem) 0 0;
+  padding-top: clamp(1.25rem, 3.5vw, 1.75rem);
+  border-top: 1px solid var(--border);
+  font-size: clamp(1.05rem, 3vw, 1.22rem);
+  font-weight: 600;
+  line-height: 1.9;
+  color: var(--heading);
+}
+
+/* ----------------------------------------------------- 品牌時間軸 --- */
+
+.journey__list {
+  list-style: none;
+  margin: clamp(2rem, 5vw, 3rem) 0 0;
+  padding: 0;
+  position: relative;
+  display: grid;
+  gap: clamp(1.75rem, 4vw, 2.25rem);
+}
+
+/* 手機：直式，連接線沿著圖示中心往下 */
+.journey__list::before {
+  content: "";
+  position: absolute;
+  left: 1.71875rem;           /* 圖示寬 3.5rem 的一半，減去線寬 */
+  top: 3.5rem;
+  bottom: 3.5rem;
+  width: 1px;
+  background: var(--border);
+}
+
+.journey__step {
+  position: relative;
+  display: flex;
+  gap: 1.15rem;
+  align-items: flex-start;
+}
+
+.journey__icon {
+  flex: 0 0 3.5rem;
+  width: 3.5rem;
+  height: 3.5rem;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  background: var(--surface);
+  color: var(--accent);
+  position: relative;         /* 蓋住底下的連接線 */
+  z-index: 1;
+}
+.journey__icon svg { width: 1.5rem; height: 1.5rem; }
+
+.journey__body { min-width: 0; padding-top: .35rem; }
+
+.journey__num {
+  display: block;
+  font-size: .72rem;
+  font-weight: 700;
+  letter-spacing: .14em;
+  color: var(--text-muted);
+  opacity: .7;
+}
+
+.journey__stage {
+  margin: .3rem 0 .2rem;
+  font-size: 1.02rem;
+}
+
+.journey__role {
+  margin: 0 0 .45rem;
+  font-size: .84rem;
+  font-weight: 600;
+  color: var(--accent);
+}
+
+.journey__detail {
+  margin: 0;
+  font-size: .88rem;
+  line-height: 1.85;
+  color: var(--text-muted);
+}
+
+/* 桌機：橫式流程，連接線穿過圖示中心 */
+@media (min-width: 52rem) {
+  .journey__list {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 1.25rem;
+  }
+
+  .journey__list::before {
+    left: 10%;
+    right: 10%;
+    top: 1.75rem;             /* 圖示垂直中心 */
+    bottom: auto;
+    width: auto;
+    height: 1px;
+  }
+
+  .journey__step {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 0;
+  }
+
+  .journey__body { padding-top: 1rem; }
+  .journey__icon { margin-bottom: 0; }
+}
+
 /* ------------------------------------------------------- 合作成果 --- */
 
 .results {

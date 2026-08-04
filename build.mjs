@@ -847,6 +847,78 @@ function renderArticles(posts) {
   });
 }
 
+/**
+ * 時間軸的線條圖示。
+ * 內嵌 SVG 而非圖檔或字型：沒有額外請求、跟著文字色走、放大不糊。
+ * aria-hidden——旁邊就有文字說明，讓螢幕閱讀器唸圖示只會變成雜訊。
+ */
+const JOURNEY_ICONS = {
+  care: '<path d="M12 20s-6.4-4.2-8.3-7.5A4.7 4.7 0 0 1 12 7.2a4.7 4.7 0 0 1 8.3 5.3C18.4 15.8 12 20 12 20z"/>',
+  social:
+    '<circle cx="9" cy="8" r="3"/><path d="M3.5 19.5a5.5 5.5 0 0 1 11 0"/><circle cx="17.5" cy="10.5" r="2.2"/><path d="M16.5 19.5a4.8 4.8 0 0 1 4-4.2"/>',
+  manage:
+    '<path d="M4 21V6.6L11 3.5l7 3.1V21"/><path d="M2.5 21h19"/><path d="M9.5 21v-4.5h3V21"/><path d="M8 9.5h1.5M13 9.5h1.5M8 13h1.5M13 13h1.5"/>',
+  study:
+    '<path d="M12 4 2.5 8.7 12 13.4l9.5-4.7L12 4z"/><path d="M6.2 11v4.3c0 1.6 2.6 2.9 5.8 2.9s5.8-1.3 5.8-2.9V11"/>',
+  share:
+    '<circle cx="6" cy="12" r="2.4"/><circle cx="18" cy="6.2" r="2.4"/><circle cx="18" cy="17.8" r="2.4"/><path d="M8.2 10.9 15.8 7.3M8.2 13.1l7.6 3.6"/>',
+};
+
+function journeyIcon(name) {
+  const paths = JOURNEY_ICONS[name] || JOURNEY_ICONS.share;
+  return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">${paths}</svg>`;
+}
+
+/**
+ * 品牌故事型時間軸。
+ * 手機直式（線在左側）、桌機橫式（線穿過圖示）——同一份 HTML，只換 CSS。
+ * 用 <ol> 是因為這些節點有先後順序，語意上就是有序清單。
+ */
+function journeyBlock() {
+  const j = site.journey;
+  if (!Array.isArray(j?.steps) || !j.steps.length) return '';
+
+  return `
+      <section class="section journey">
+        <div class="wrap">
+          <h2 class="section__head">${escapeHtml(j.heading || '我的長照旅程')}</h2>
+          ${j.lede ? `<p class="section__lede">${escapeHtml(j.lede)}</p>` : ''}
+          <ol class="journey__list">
+${j.steps
+  .map(
+    (s, i) => `            <li class="journey__step">
+              <span class="journey__icon">${journeyIcon(s.icon)}</span>
+              <div class="journey__body">
+                <span class="journey__num" aria-hidden="true">0${i + 1}</span>
+                <h3 class="journey__stage">${escapeHtml(s.stage)}</h3>
+                ${s.role ? `<p class="journey__role">${escapeHtml(s.role)}</p>` : ''}
+                ${s.detail ? `<p class="journey__detail">${escapeHtml(s.detail)}</p>` : ''}
+              </div>
+            </li>`,
+  )
+  .join('\n')}
+          </ol>
+          ${j.motto ? `<p class="motto">${escapeHtml(j.motto)}</p>` : ''}
+        </div>
+      </section>`;
+}
+
+/** 「關於我」的敘事段落 ＋ 使命宣言。 */
+function storyBlock() {
+  const s = site.aboutStory;
+  if (!s) return '';
+
+  return `
+      <section class="section story">
+        <div class="wrap">
+          <div class="story__body">
+${(s.paragraphs || []).map((t) => `            <p>${escapeHtml(t)}</p>`).join('\n')}
+          </div>
+          ${s.mission ? `<p class="story__mission">${escapeHtml(s.mission)}</p>` : ''}
+        </div>
+      </section>`;
+}
+
 /** 四個獨立頁面的定義。內容全部來自 site.config.json。 */
 function standalonePages() {
   const names = (arr) => (Array.isArray(arr) ? arr.map((a) => a.title).join('、') : '');
@@ -854,8 +926,8 @@ function standalonePages() {
     {
       slug: 'about',
       label: '關於我',
-      description: `${site.author}的專業背景：${names(site.about)}。`,
-      body: cardSection('about', '', site.about),
+      description: `${site.author}：長照機構營運與評鑑顧問、社工教師。從照顧服務員、社工到機構主任，現就讀東海大學社工博士班。`,
+      body: `${storyBlock()}${journeyBlock()}${cardSection('about', '專業定位', site.about)}`,
     },
     {
       slug: 'services',
