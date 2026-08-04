@@ -560,7 +560,9 @@ ${footerBlock(hero, up)}
 <script src="${ver(`${up}assets/js/counter.js`)}" defer></script>
 ${pageSlug === 'results' ? `<script src="${ver(`${up}assets/js/stats.js`)}" defer></script>` : ''}
 ${pageSlug === 'contact' ? `<script src="${ver(`${up}assets/js/email.js`)}" defer></script>` : ''}
-${bodyClass === 'page-post' || bodyClass === 'page-home' ? `<script src="${ver(`${up}assets/js/share.js`)}" defer></script>` : ''}
+${/* 直接看這一頁有沒有分享鈕，不要維護一份頁面白名單——
+     以前每加一個有分享列的頁面就要記得回來改這裡，遲早會漏。 */ ''}
+${content.includes('data-share-url') ? `<script src="${ver(`${up}assets/js/share.js`)}" defer></script>` : ''}
 </body>
 </html>
 `;
@@ -1207,7 +1209,7 @@ function renderIndex(posts) {
  */
 function renderStandalone({
   slug, label, description, lede = '', body,
-  pageType = 'WebPage', extraLd = [], mainEntity,
+  pageType = 'WebPage', extraLd = [], mainEntity, share = false,
 }) {
   const pageUrl = origin ? `${origin}/${slug}/` : '';
 
@@ -1226,7 +1228,14 @@ function renderStandalone({
           ${lede ? `<p class="page-head__lede">${markEn(clauses(lede))}</p>` : ''}
         </div>
       </section>
-${body}`;
+${body}${
+  share
+    ? `
+      <div class="wrap">
+${shareBlock({ url: pageUrl, title: `${label}｜${site.title}` })}
+      </div>`
+    : ''
+}`;
 
   return layout({
     title: `${label}｜${site.title}`,
@@ -1481,6 +1490,7 @@ function standalonePages() {
     {
       slug: 'about',
       label: '關於我',
+      share: true,
       description: `${site.author}：長照機構營運與評鑑顧問、社工教師。從照顧服務員、社工到機構主任，現就讀東海大學社工博士班。`,
       // 這一頁有完整的職涯敘事，是全站最該建立 E-E-A-T 的一頁。
       // 型別升為 ProfilePage，mainEntity 掛上唯一一份展開的 Person 節點。
@@ -1491,6 +1501,7 @@ function standalonePages() {
     {
       slug: 'services',
       label: '我的服務',
+      share: true,
       description: site.pageMeta?.services || site.description,
       lede: svc.lede || '',
       // 三項可販售的顧問服務，以前只是泛型 WebPage，無法被理解成服務項目頁。
