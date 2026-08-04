@@ -294,14 +294,19 @@
         "label": "電話",
         "value": "0988-343-304",
         "href": "tel:+886988343304"
+      },
+      {
+        "label": "LINE",
+        "value": "peace821116",
+        "href": "https://line.me/ti/p/zEokx_kBi4"
       }
     ],
     "qr": {
       "label": "LINE",
       "image": "assets/img/line-qr.webp",
       "size": 600,
-      "alt": "顏和平的 LINE 官方帳號 QR Code，用 LINE 掃描即可加入好友。",
-      "note": "用 LINE 掃描加入好友"
+      "alt": "顏和平的 LINE 加好友 QR Code，LINE ID 為 peace821116。",
+      "note": "掃描或點上方 LINE ID 加好友"
     }
   },
   "contactPage": {

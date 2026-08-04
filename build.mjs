@@ -933,7 +933,7 @@ ${items
             String(i.value).replace('@', '（at）').replace(/\.(?=[^.]*$)/, '（dot）'),
           )}</span>`
         : i.href
-          ? `<a class="contact__value" href="${escapeHtml(i.href)}"${/^https?:/.test(i.href) ? ' target="_blank" rel="noopener noreferrer"' : ''}>${escapeHtml(i.value)}</a>`
+          ? `<a class="contact__value" href="${escapeHtml(i.href)}"${/^https?:/.test(i.href) ? ' target="_blank" rel="noopener noreferrer" aria-describedby="newtab-note"' : ''}>${escapeHtml(i.value)}</a>`
           : `<span class="contact__value">${escapeHtml(i.value)}</span>`;
 
       return `            <li class="contact__item">
