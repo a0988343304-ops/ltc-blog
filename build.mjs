@@ -799,7 +799,9 @@ function clauses(text) {
   return String(text)
     .split(/(?<=，)/)
     .filter(Boolean)
-    .map((c) => `<span>${escapeHtml(c)}</span>`)
+    // data-clause 讓 CSS 只針對「子句」設 inline-block，
+    // 不會誤中 markEn() 為英文片段加上的 <span lang="en">
+    .map((c) => `<span data-clause>${escapeHtml(c)}</span>`)
     .join('');
 }
 
@@ -1221,7 +1223,7 @@ function renderStandalone({
         <div class="wrap">
           ${crumbsNav(crumbs)}
           <h1 class="page-head__title">${escapeHtml(label)}</h1>
-          ${lede ? `<p class="page-head__lede">${markEn(escapeHtml(lede))}</p>` : ''}
+          ${lede ? `<p class="page-head__lede">${markEn(clauses(lede))}</p>` : ''}
         </div>
       </section>
 ${body}`;
