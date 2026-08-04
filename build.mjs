@@ -657,6 +657,21 @@ ${items
  * 這一區會被潛在客戶與公部門當成事實查看，寧可空著也不能捏造。
  */
 /**
+ * 把句子依全形逗號切成子句，每個子句包成 inline-block。
+ *
+ * 中文可以在任意字元間斷行，長句子常常斷在詞語中間很難看。
+ * 包成 inline-block 之後，換行點會優先落在逗號後面；
+ * 寬度夠時整句仍然併成完整一行。
+ */
+function clauses(text) {
+  return String(text)
+    .split(/(?<=，)/)
+    .filter(Boolean)
+    .map((c) => `<span>${escapeHtml(c)}</span>`)
+    .join('');
+}
+
+/**
  * 顧問成果。
  *
  * 數字用 data-count-to 交給 JS 做捲到才跑的動畫，但 HTML 裡本來就寫著
@@ -710,7 +725,7 @@ ${r.work.map((t) => `            <li>${escapeHtml(t)}</li>`).join('\n')}
             Array.isArray(r.belief) && r.belief.length
               ? `<h3 class="subhead">${escapeHtml(r.beliefHeading || '我相信')}</h3>
           <blockquote class="belief">
-${r.belief.map((t) => `            <p>${escapeHtml(t)}</p>`).join('\n')}
+${r.belief.map((t) => `            <p>${clauses(t)}</p>`).join('\n')}
           </blockquote>`
               : ''
           }

@@ -681,12 +681,15 @@ h1, h2, h3, h4 {
 }
 
 /* 「我相信」 */
+/* 不壓在 --content：這兩句本來就長，給滿版寬度才有機會一行放完 */
 .belief {
   margin: 0;
-  max-width: var(--content);
   padding-left: 1.15rem;
   border-left: 2px solid var(--accent);
 }
+
+/* 子句各自 inline-block，換行只會發生在逗號之後，不會斷在詞語中間 */
+.belief span { display: inline-block; }
 
 .belief p {
   margin: 0 0 .9rem;
@@ -726,6 +729,19 @@ h1, h2, h3, h4 {
   font-size: .84rem;
   line-height: 1.6;
   color: var(--text-muted);
+}
+
+/* 結語／品牌宣言。置中、放大、用主色。
+   （這段樣式先前重構區塊時被誤刪，導致宣言變成一般靠左的文字。） */
+.motto {
+  margin: clamp(2rem, 5vw, 3rem) auto 0;
+  max-width: var(--content);
+  text-align: center;
+  font-size: clamp(1.05rem, 3vw, 1.3rem);
+  font-weight: 700;
+  line-height: 1.85;
+  color: var(--accent);
+  text-wrap: pretty;
 }
 
 /* ------------------------------------------------------- 聯絡方式 --- */
