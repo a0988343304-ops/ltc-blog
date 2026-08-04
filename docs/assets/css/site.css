@@ -200,14 +200,28 @@ h1, h2, h3, h4 {
   white-space: nowrap;
 }
 
+/* padding-block .55rem 把命中框從 32px 撐到約 43px。
+   .topnav 是 overflow-x: auto 的橫向捲軸容器，加高只影響頁首高度，
+   不會造成水平溢出；sticky 頁首變高後 scroll-padding-top 仍蓋得住。 */
 .topnav a {
   display: inline-block;
-  padding-block: .2rem;
+  padding-block: .55rem;
   font-size: .88rem;
   color: var(--text-muted);
   text-decoration: none;
 }
 .topnav a:hover { color: var(--accent); text-decoration: underline; }
+
+/* build 端一直有輸出 aria-current="page"，但沒有任何對應樣式，
+   等於這個資訊只給輔助科技、沒給明眼使用者。
+   粗體＋底線同時提供非色彩線索，不單靠顏色區分。 */
+.topnav a[aria-current="page"] {
+  color: var(--text);
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 6px;
+  text-decoration-thickness: 2px;
+}
 
 @media (min-width: 52rem) {
   .topnav { order: 0; flex-basis: auto; margin-inline: auto; }
@@ -311,7 +325,9 @@ h1, h2, h3, h4 {
   letter-spacing: -.01em;
 }
 
-/* 品牌宣言，跟人名同在 h1 裡：人名建立信任、宣言說清楚主張 */
+/* h1 的副標，吃的是 profile.headline（領域）。
+   原本這裡放品牌標語，但標語裡沒有任何會被搜尋的詞，
+   等於浪費全頁最強的主題訊號；標語移到底下的 .profile__tagline。 */
 .profile__field {
   display: block;
   margin-top: .55rem;
@@ -320,6 +336,15 @@ h1, h2, h3, h4 {
   letter-spacing: .02em;
   color: var(--accent);
 }
+
+/* 品牌標語。子句包成 inline-block（clauses()），換行只落在全形逗號後。 */
+.profile__tagline {
+  margin: .55rem 0 0;
+  font-size: clamp(.98rem, 2.6vw, 1.1rem);
+  font-weight: 600;
+  color: var(--text-muted);
+}
+.profile__tagline span { display: inline-block; }
 
 .profile__role {
   margin: .7rem 0 0;
@@ -346,9 +371,14 @@ h1, h2, h3, h4 {
 
 .page-head__lede {
   margin: .8rem 0 0;
+  max-width: var(--content);
   color: var(--text-muted);
   font-size: .95rem;
+  line-height: 1.9;
 }
+
+/* 介紹頁的麵包屑在 h1 上方，跟文章頁共用 .crumbs 樣式 */
+.page-head .crumbs { margin-bottom: .7rem; }
 
 .listing__more {
   margin: clamp(1.5rem, 4vw, 2rem) 0 0;
@@ -393,7 +423,51 @@ h1, h2, h3, h4 {
 
 .section__head + .tiles,
 .section__head + .results,
+.section__head + .section__intro,
+.section__head + .client,
+.section__head + .howto__list,
 .section__head + .placeholder { margin-top: 1.75rem; }
+
+/* --------------------------------------- 聯絡頁：合作流程與主題範圍 --- */
+
+.howto + .howto { margin-top: clamp(2rem, 5vw, 2.75rem); }
+
+.howto__list {
+  max-width: var(--content);
+  margin: 1.25rem 0 0;
+  padding-left: 1.15rem;
+  display: grid;
+  gap: .6rem;
+  font-size: .93rem;
+  line-height: 1.9;
+  color: var(--text-muted);
+}
+.howto__list li { text-wrap: pretty; }
+
+/* ------------------------------------------------- 頁尾的行動呼籲 --- */
+
+/* 介紹頁原本是連結拓撲上的死路：進來之後除了頁首導覽沒有任何出口。 */
+.cta {
+  max-width: var(--content);
+  margin: 0;
+  padding: clamp(1.1rem, 3vw, 1.5rem);
+  background: var(--accent-soft);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: .35rem 1rem;
+  font-size: .93rem;
+  line-height: 1.85;
+}
+.cta__text { color: var(--text); }
+.cta__link {
+  font-weight: 700;
+  display: inline-block;
+  padding-block: .4rem;
+  margin-block: -.25rem;
+}
 
 /* 卡片：只用細框與大留白，不加彩色邊條 */
 .tiles {
@@ -431,6 +505,40 @@ h1, h2, h3, h4 {
   /* 卡片欄位窄，避免最後一行只剩一兩個字的孤字 */
   text-wrap: pretty;
 }
+
+/* 服務卡底下的「適用機構類型／常見合作方式／產出物」。
+   用 <dl> 而不是再多開標題層級——這些是卡片的屬性，不是新的章節。 */
+.tile__meta {
+  margin: 1rem 0 0;
+  padding-top: .9rem;
+  border-top: 1px solid var(--border);
+  font-size: .84rem;
+  line-height: 1.8;
+}
+.tile__meta dt {
+  font-weight: 700;
+  color: var(--text);
+  letter-spacing: .02em;
+}
+.tile__meta dd {
+  margin: .15rem 0 .8rem;
+  color: var(--text-muted);
+  text-wrap: pretty;
+}
+.tile__meta dd:last-child { margin-bottom: 0; }
+
+/* 區塊開頭的說明段落。h1 底下直接接卡片時，中間缺一段承接的本文。 */
+.section__intro {
+  max-width: var(--content);
+  margin: 0 0 clamp(1.5rem, 4vw, 2rem);
+}
+.section__intro p {
+  margin: 0 0 1rem;
+  font-size: .95rem;
+  line-height: 1.95;
+  color: var(--text-muted);
+}
+.section__intro p:last-child { margin-bottom: 0; }
 
 /* ------------------------------------------------------ 關於我：故事 --- */
 
@@ -487,6 +595,42 @@ h1, h2, h3, h4 {
 .story__mission span { display: inline-block; }
 .story__mission { max-width: none; text-wrap: pretty; }
 
+/* --------------------------------------------------- 團隊領導成果 --- */
+
+.leadership__inner {
+  display: grid;
+  gap: clamp(1.5rem, 4vw, 2.5rem);
+  grid-template-columns: 1fr;
+  align-items: start;
+}
+
+@media (min-width: 52rem) {
+  .leadership__inner { grid-template-columns: minmax(0, 1fr) 26rem; }
+}
+
+.award {
+  margin: 0;
+  justify-self: center;
+  max-width: 26rem;
+  width: 100%;
+}
+
+.award__img {
+  width: 100%;
+  height: auto;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  background: var(--border);
+}
+
+.award__caption {
+  margin-top: .65rem;
+  font-size: .82rem;
+  line-height: 1.7;
+  color: var(--text-muted);
+  text-align: center;
+}
+
 /* ----------------------------------------------------- 品牌時間軸 --- */
 
 .journey__list {
@@ -533,13 +677,17 @@ h1, h2, h3, h4 {
 
 .journey__body { min-width: 0; padding-top: .35rem; }
 
+/* 編號 01-05。刻意不用 opacity 再壓一層：--text-muted 疊 opacity: .7 之後
+   對 --bg-soft 只剩淺色 2.83:1、深色 4.39:1，兩套配色都低於 AA 對小字要求的
+   4.5:1（.72rem ≈ 11.5px，即使 700 字重也遠低於大字門檻 18.66px bold）。
+   而且 opacity 在 DevTools 的對比檢查上看不出來。
+   單獨使用 --text-muted：淺色 5.07:1、深色 7.62:1，都通過。 */
 .journey__num {
   display: block;
   font-size: .72rem;
   font-weight: 700;
   letter-spacing: .14em;
   color: var(--text-muted);
-  opacity: .7;
 }
 
 .journey__stage {
@@ -600,7 +748,16 @@ h1, h2, h3, h4 {
   border-radius: var(--radius);
 }
 
-.client__name { margin: 0 0 .75rem; font-size: clamp(1.05rem, 3vw, 1.25rem); }
+/* 客戶名稱以前是這一頁唯一的 h2，等於把頁面第二強的主題訊號讓給一間公司名，
+   從標題大綱看這頁像是在講那間公司而不是「顏和平的顧問成果」。
+   降為 <p>，主題詞交給上面的 section__head。字級與字重刻意維持原本 h2 的樣子。 */
+.client__name {
+  margin: 0 0 .75rem;
+  font-size: clamp(1.05rem, 3vw, 1.25rem);
+  font-weight: 700;
+  line-height: 1.35;
+  color: var(--heading);
+}
 
 .client__role {
   margin: 0 0 1rem;
@@ -827,7 +984,14 @@ h1, h2, h3, h4 {
   letter-spacing: .04em;
 }
 
-.contact__value { min-width: 0; overflow-wrap: anywhere; }
+/* inline-block + padding 把命中框從 29px 撐到 44px 以上。
+   Email 與電話是這一頁唯二的操作目標，手指按得到比較重要。 */
+.contact__value {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  display: inline-block;
+  padding-block: .4rem;
+}
 
 /* 尚未填入真實內容的版位。刻意做得明顯，避免誤上線。 */
 .placeholder {
@@ -918,7 +1082,15 @@ h1, h2, h3, h4 {
 }
 
 .card__title { margin: 0 0 .5rem; font-size: 1.12rem; }
-.card__title a { color: var(--heading); text-decoration: none; }
+/* padding 撐高命中框（26px → 約 37px），負邊距抵銷掉多出來的高度，
+   卡片版面與改動前完全一致（CLS 仍為 0）。 */
+.card__title a {
+  color: var(--heading);
+  text-decoration: none;
+  display: inline-block;
+  padding-block: .42rem;
+  margin-block: -.42rem;
+}
 .card__title a:hover { color: var(--accent); text-decoration: underline; }
 .card__title a:focus-visible { text-decoration: underline; }
 
@@ -1193,6 +1365,30 @@ h1, h2, h3, h4 {
   box-decoration-break: clone;
   -webkit-box-decoration-break: clone;
 }
+
+/* 次要導覽：長頁面捲到底時不必再回到頁首，也讓每一頁多一批可被爬取的
+   站內連結（全站的內部連結原本只有頁首那一組）。 */
+.footer__nav {
+  max-width: var(--content);
+  margin: 0 auto 1.5rem;
+}
+.footer__nav ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: .35rem clamp(.9rem, 3vw, 1.6rem);
+}
+.footer__nav a {
+  display: inline-block;
+  padding-block: .5rem;
+  font-size: .85rem;
+  color: var(--text-muted);
+  text-decoration: none;
+}
+.footer__nav a:hover { color: var(--accent); text-decoration: underline; }
 
 .footer__meta {
   margin: 0;

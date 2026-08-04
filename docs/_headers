@@ -1,14 +1,23 @@
 # Cloudflare Pages 標頭設定。
 # build.mjs 的 cp(STATIC_DIR, OUT_DIR) 會把這個檔案複製到 docs/ 根目錄。
 #
+# 規則順序很重要：Cloudflare Pages 會套用所有相符的規則，
+# 同名標頭由「後出現」的規則覆蓋。所以先寫涵蓋全站的 /*，
+# 再寫 /assets/*；順序放反會讓 /assets/* 的長期快取被 /* 的 max-age=0 洗掉。
+
+# HTML 不快取：內容會改，而且它本來就靠 304 很便宜。
+#
+# 這裡用 /* 而不是 /*.html：Cloudflare Pages 會把所有帶 .html 副檔名的網址
+# 308 轉址到無副檔名版本（/about/index.html → 308 → /about/），
+# 線上永遠不會有以 .html 結尾的請求路徑，那條規則一次都比對不到。
+# 以前沒有造成實際損害，純粹是因為 Cloudflare 的預設值恰好等於這裡想設的值，
+# 但註解寫的意圖並沒有真的被強制執行——預設值一改這個站就沒有任何保護。
+/*
+  Cache-Control: public, max-age=0, must-revalidate
+
 # /assets/* 底下的 CSS、JS、圖片一律長期快取：引用處都帶了 ?v=<內容雜湊>，
 # 內容一改網址就跟著改，所以 immutable 是安全的。
 # 沒有這一段時 Cloudflare Pages 預設回 max-age=0, must-revalidate，
 # 每一個資產每次回訪都要多付一個 RTT 等 304。
-
 /assets/*
   Cache-Control: public, max-age=31536000, immutable
-
-# HTML 不快取：內容會改，而且它本來就靠 304 很便宜。
-/*.html
-  Cache-Control: public, max-age=0, must-revalidate

@@ -27,6 +27,8 @@ heroCredit: 本頁 HERO 圖由本站作者製作，非原刊媒體之圖像。
 
 以社區式長照機構（日間照顧中心）為例，機構需全面盤點工作流程的各個環節，並逐一對照評鑑指標。再依「服務為中心」的流程把指標拆解重組，使其貼合日常工作，形成系統性的工作模式。唯有經過這樣的「解構與重建」，才能發展出把評鑑落實於日常服務的工作制度。
 
+這個拆解與重組的過程，也正是我在[評鑑輔導與機構營運管理服務](../services/)中陪機構做的事：先盤點日常流程，再把指標與文件放回它原本該在的位置，而不是評鑑前另外補一疊資料。
+
 ## 二、評鑑文件背後繁瑣「連動邏輯」的痛點
 
 即便重新梳理流程，實務上仍難完全消除「事件為中心」制度下的反覆多工。
@@ -41,6 +43,8 @@ heroCredit: 本頁 HERO 圖由本站作者製作，非原刊媒體之圖像。
 <figure>
   <a href="../assets/img/flow-satisfaction-survey.webp" target="_blank" rel="noopener noreferrer" aria-describedby="fig-satisfaction-cap">
     <img src="../assets/img/flow-satisfaction-survey.webp"
+         srcset="../assets/img/flow-satisfaction-survey-768.webp 768w, ../assets/img/flow-satisfaction-survey-1152.webp 1152w, ../assets/img/flow-satisfaction-survey.webp 1536w"
+         sizes="(max-width: 44rem) 100vw, 42rem"
          alt="滿意度調查分析與改善措施之追蹤流程圖：五個環節串成一條線，同一份分析結果貫穿全程。"
          width="1536" height="1024" loading="lazy" decoding="async" />
   </a>
@@ -59,9 +63,13 @@ heroCredit: 本頁 HERO 圖由本站作者製作，非原刊媒體之圖像。
 
 唯有如此，機構才能精準分析出「社區式日間照顧業務負責人」的專業職能，並據以發展職能面試、培訓與考核。這才是解決長照機構「選、育、留、用」問題的根本。
 
+實際帶著社區式長照機構走過這一套流程、建立 SOP 與文件管理制度的紀錄，整理在[顧問成果](../results/)。
+
 <figure>
   <a href="../assets/img/flow-service-centered-accreditation.webp" target="_blank" rel="noopener noreferrer" aria-describedby="fig-accreditation-cap">
     <img src="../assets/img/flow-service-centered-accreditation.webp"
+         srcset="../assets/img/flow-service-centered-accreditation-768.webp 768w, ../assets/img/flow-service-centered-accreditation-1152.webp 1152w, ../assets/img/flow-service-centered-accreditation.webp 1536w"
+         sizes="(max-width: 44rem) 100vw, 42rem"
          alt="社區式日間照顧機構以服務為中心的評鑑流程管理全圖：上半部依服務順序排列各環節與對應指標，下半部歸納為五大工作情境。"
          width="1536" height="1024" loading="lazy" decoding="async" />
   </a>
@@ -70,4 +78,4 @@ heroCredit: 本頁 HERO 圖由本站作者製作，非原刊媒體之圖像。
 
 ---
 
-*本文作者顏和平，現任仁德醫護管理專科學校高齡健康促進科專案講師。*
+*本文作者顏和平，現任仁德醫護管理專科學校高齡健康促進科專案講師，並擔任長照機構營運暨評鑑顧問。作者的[專業背景與長照職涯](../about/)。*
