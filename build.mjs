@@ -543,14 +543,79 @@ ${posts
       </ul>`;
 }
 
+/**
+ * 首頁的信任區塊：人像、定位、專業背景。
+ *
+ * 訪客通常在幾秒內決定要不要繼續看，所以首頁開頭放的是「你是誰、做什麼、
+ * 能帶來什麼」，而不是文章列表。文章索引往下移。
+ *
+ * h1 同時含人名與領域：人名建立信任、領域承接搜尋關鍵字，兩者都要。
+ */
+function profileBlock() {
+  const p = site.profile;
+  if (!p) return '';
+
+  const src = escapeHtml(assetVer(p.photo));
+  const small = p.photoSmall ? escapeHtml(assetVer(p.photoSmall)) : '';
+  const size = Number(p.photoSize) || 560;
+
+  return `
+      <section class="profile">
+        <div class="wrap profile__inner">
+          <img
+            class="profile__photo"
+            src="${src}"${
+              small
+                ? `
+            srcset="${small} 280w, ${src} ${size}w"
+            sizes="(max-width: 46rem) 9.5rem, 13rem"`
+                : ''
+            }
+            alt="${escapeHtml(p.photoAlt || p.name)}"
+            width="${size}"
+            height="${size}"
+            fetchpriority="high"
+            decoding="async"
+          />
+          <div class="profile__text">
+            <h1 class="profile__name">
+              ${escapeHtml(p.name)}<span class="profile__field">${escapeHtml(p.field || '')}</span>
+            </h1>
+            ${p.role ? `<p class="profile__role">${escapeHtml(p.role)}</p>` : ''}
+            ${p.positioning ? `<p class="profile__lede">${escapeHtml(p.positioning)}</p>` : ''}
+          </div>
+        </div>
+      </section>${whyBlock()}`;
+}
+
+/** 「為什麼選擇我」＋品牌宣言。內容全部來自 site.config.json，改字不必動程式。 */
+function whyBlock() {
+  const p = site.profile;
+  if (!Array.isArray(p?.why) || !p.why.length) return '';
+
+  return `
+      <section class="why">
+        <div class="wrap">
+          <h2 class="why__head">${escapeHtml(p.whyHeading || '為什麼選擇我')}</h2>
+          <ul class="why__list">
+${p.why
+  .map(
+    (w) => `            <li class="why__item">
+              <h3 class="why__title">${escapeHtml(w.title)}</h3>
+              ${w.detail ? `<p class="why__detail">${escapeHtml(w.detail)}</p>` : ''}
+            </li>`,
+  )
+  .join('\n')}
+          </ul>
+          ${p.motto ? `<p class="motto">${escapeHtml(p.motto)}</p>` : ''}
+        </div>
+      </section>`;
+}
+
 function renderIndex(posts) {
   const newest = contentUpdated;
 
-  const content = `${heroBlock({
-    eyebrow: '長照機構經營筆記',
-    title: site.title,
-    lede: site.tagline,
-  })}
+  const content = `${profileBlock()}
       <div class="wrap">
         <section class="listing">
           <div class="listing__head">
@@ -583,7 +648,17 @@ function renderIndex(posts) {
       name: site.title,
       description: site.description,
       inLanguage: 'zh-Hant-TW',
-      author: { '@type': 'Person', name: site.author },
+      // 首頁主打個人專業信任，把 Person 的欄位補齊：搜尋引擎判斷
+      // 內容可信度時會看作者是誰、有什麼專業背景。
+      author: {
+        '@type': 'Person',
+        name: site.author,
+        ...(site.profile?.role ? { jobTitle: site.profile.role } : {}),
+        ...(site.profile?.field ? { knowsAbout: site.profile.field } : {}),
+        ...(origin && site.profile?.photo
+          ? { image: `${origin}/${site.profile.photo}` }
+          : {}),
+      },
       publisher: { '@type': 'Person', name: site.author },
       // 首頁是文章索引頁，把 Blog → BlogPosting 的關聯明講出來。
       // 卡片本身仍是靜態 HTML，這裡只是額外的結構化訊號。
@@ -598,7 +673,9 @@ function renderIndex(posts) {
       })),
     })}</script>`,
     content,
-    hero: site.hero,
+    // 首頁已不再使用那張 CC BY 的建築照，footer 就不該繼續掛它的授權聲明
+    // （錯誤標示比不標示更糟）。CC BY 的義務由實際使用它的文章頁承擔。
+    hero: { credit: '首頁人像照由本站作者提供。' },
   });
 }
 

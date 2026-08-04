@@ -241,6 +241,115 @@ h1, h2, h3, h4 {
   font-size: clamp(.98rem, 2.6vw, 1.1rem);
 }
 
+/* ------------------------------------------------- 首頁：信任區塊 --- */
+
+.profile__inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: clamp(1.25rem, 4vw, 2.25rem);
+  padding-block: clamp(2rem, 6vw, 3.5rem);
+}
+
+@media (min-width: 46rem) {
+  .profile__inner { flex-direction: row; text-align: left; }
+}
+
+.profile__photo {
+  width: clamp(9.5rem, 28vw, 13rem);
+  height: auto;
+  aspect-ratio: 1;
+  object-fit: cover;
+  border-radius: 50%;
+  flex-shrink: 0;                 /* 窄螢幕時不要被文字擠扁 */
+  box-shadow: var(--shadow);
+  background: var(--border);
+}
+
+.profile__text { min-width: 0; }
+
+.profile__name {
+  margin: 0;
+  font-size: clamp(1.9rem, 6vw, 2.6rem);
+  letter-spacing: -.01em;
+}
+
+/* 領域名稱跟人名同在 h1 裡：人名建立信任、領域承接關鍵字 */
+.profile__field {
+  display: block;
+  margin-top: .3rem;
+  font-size: clamp(.95rem, 2.6vw, 1.1rem);
+  font-weight: 600;
+  letter-spacing: .04em;
+  color: var(--accent);
+}
+
+.profile__role {
+  margin: .7rem 0 0;
+  font-size: .92rem;
+  color: var(--text-muted);
+}
+
+.profile__lede {
+  margin: 1.1rem 0 0;
+  font-size: clamp(1.05rem, 3vw, 1.3rem);
+  font-weight: 600;
+  line-height: 1.65;
+  color: var(--text);
+}
+
+/* ------------------------------------------------- 首頁：為什麼選擇我 --- */
+
+.why { padding-bottom: clamp(1.5rem, 5vw, 2.5rem); }
+
+.why__head {
+  margin: 0 0 1.25rem;
+  font-size: 1.25rem;
+  text-align: center;
+}
+
+.why__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: var(--gap);
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 46rem) {
+  .why__list { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+
+.why__item {
+  min-width: 0;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-top: 3px solid var(--accent);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: clamp(1rem, 3vw, 1.35rem);
+}
+
+.why__title { margin: 0 0 .5rem; font-size: 1.02rem; }
+
+.why__detail {
+  margin: 0;
+  font-size: .9rem;
+  line-height: 1.75;
+  color: var(--text-muted);
+}
+
+.motto {
+  margin: clamp(1.75rem, 5vw, 2.5rem) 0 0;
+  text-align: center;
+  font-size: clamp(1.15rem, 3.4vw, 1.5rem);
+  font-weight: 700;
+  line-height: 1.6;
+  color: var(--accent);
+}
+
 /* ---------------------------------------------------------- 文章列表 --- */
 
 .listing { padding-bottom: 3rem; }

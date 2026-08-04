@@ -20,6 +20,32 @@
     "sourceUrl": "https://commons.wikimedia.org/wiki/File:2026.05.01_National_Center_for_Geriatrics_and_Welfare_Research,_NHRI_02.jpg",
     "modified": false
   },
+  "profile": {
+    "name": "顏和平",
+    "field": "長照機構營運管理",
+    "role": "仁德醫護管理專科學校高齡健康促進科專案講師",
+    "positioning": "讓長照機構經營更有方向，評鑑準備不再只是摸索。",
+    "photo": "assets/img/portrait-yen-560.webp",
+    "photoSmall": "assets/img/portrait-yen-280.webp",
+    "photoAlt": "顏和平的形象照，穿條紋襯衫站在灰色背景前。",
+    "photoSize": 560,
+    "whyHeading": "為什麼選擇我",
+    "why": [
+      {
+        "title": "橫跨居家、日照、住宿三種模式",
+        "detail": "三種服務型態的法規要求、人力配置與流程設計都不同。能對照著談，才看得出哪些做法可以移植、哪些不行。"
+      },
+      {
+        "title": "實務、管理與研究兼具",
+        "detail": "現場經驗負責檢驗方法能不能落地，管理視角負責看成本與風險，研究方法負責讓結論站得住腳。"
+      },
+      {
+        "title": "持續擔任顧問與教學",
+        "detail": "把機構遇到的真實問題帶回課堂拆解，再把整理過的方法帶回現場驗證。"
+      }
+    ],
+    "motto": "讓長照不只靠經驗，更靠方法。"
+  },
   "counter": {
     "apiBase": "https://ltc-blog.pages.dev"
   }
