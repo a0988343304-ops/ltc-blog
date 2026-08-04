@@ -117,9 +117,10 @@ h1, h2, h3, h4 {
   color: var(--heading);
 }
 
-/* 首頁改用藍色系標題（含文章卡片標題）；文章頁維持綠色。
+/* 首頁與四個介紹頁用藍色系標題（含文章卡片標題）；文章內頁維持綠色。
    直接覆寫變數，底下所有吃 --heading 的規則自動跟著換。 */
-.page-home { --heading: var(--heading-home); }
+.page-home,
+.page-standalone { --heading: var(--heading-home); }
 
 .wrap {
   width: 100%;
@@ -479,9 +480,10 @@ h1, h2, h3, h4 {
   color: var(--heading);
 }
 
-/* 逐行輸出：句子要在「知識；」之後斷，交給瀏覽器會斷在不該斷的位置。
-   窄到放不下時仍允許該行自己折，不會硬撐出水平捲動。 */
-.story__mission span { display: block; }
+/* 兩個子句各自 inline-block：寬度夠時併成完整一行，
+   不夠時優先斷在分號之後，而不是斷在句子中間。 */
+.story__mission span { display: inline-block; }
+.story__mission { max-width: none; text-wrap: pretty; }
 
 /* ----------------------------------------------------- 品牌時間軸 --- */
 
@@ -584,59 +586,195 @@ h1, h2, h3, h4 {
   .journey__icon { margin-bottom: 0; }
 }
 
-/* ------------------------------------------------------- 合作成果 --- */
+/* ------------------------------------------------------- 顧問成果 --- */
 
-.results {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: grid;
-  gap: clamp(1rem, 2.5vw, 1.5rem);
-  grid-template-columns: 1fr;
-}
-
-@media (min-width: 46rem) {
-  .results { grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr)); }
-}
-
-.result {
-  min-width: 0;
+.client {
+  max-width: var(--content);
+  padding: clamp(1.5rem, 4vw, 2rem);
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  padding: clamp(1.25rem, 3.2vw, 1.75rem);
 }
 
-.result__metric {
-  margin: 0 0 .35rem;
-  font-size: clamp(1.6rem, 4.5vw, 2.1rem);
+.client__name { margin: 0 0 .75rem; font-size: clamp(1.05rem, 3vw, 1.25rem); }
+
+.client__role {
+  margin: 0 0 1rem;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: .35rem .75rem;
+  font-size: .92rem;
+  font-weight: 600;
+  color: var(--accent);
+}
+
+.client__role-label {
+  font-size: .74rem;
   font-weight: 700;
-  line-height: 1.2;
+  letter-spacing: .1em;
+  color: var(--text-muted);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: .1rem .6rem;
+}
+
+.client__summary {
+  margin: 0;
+  font-size: .95rem;
+  line-height: 1.95;
+  color: var(--text-muted);
+}
+
+/* 區塊內的小標。比 section__head 輕，用來分隔頁面內的段落。 */
+.subhead {
+  margin: clamp(2.25rem, 5vw, 3rem) 0 1rem;
+  font-size: 1.05rem;
+}
+
+/* 打勾清單 */
+.checks {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  max-width: var(--content);
+  display: grid;
+  gap: .7rem;
+}
+
+.checks li {
+  position: relative;
+  padding-left: 1.9rem;
+  font-size: .95rem;
+  line-height: 1.85;
+}
+
+.checks li::before {
+  content: "";
+  position: absolute;
+  left: .25rem;
+  top: .62em;
+  width: .7rem;
+  height: .38rem;
+  border-left: 2px solid var(--accent);
+  border-bottom: 2px solid var(--accent);
+  transform: rotate(-45deg);
+}
+
+/* 工作內容標籤 */
+.chips {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: .55rem;
+}
+
+.chips li {
+  font-size: .88rem;
+  padding: .4rem .9rem;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--text);
+}
+
+/* 「我相信」 */
+.belief {
+  margin: 0;
+  max-width: var(--content);
+  padding-left: 1.15rem;
+  border-left: 2px solid var(--accent);
+}
+
+.belief p {
+  margin: 0 0 .9rem;
+  font-size: clamp(1rem, 2.7vw, 1.1rem);
+  line-height: 1.95;
+}
+.belief p:last-child { margin-bottom: 0; }
+
+/* 視覺化數據 */
+.stats {
+  list-style: none;
+  margin: clamp(2.5rem, 6vw, 3.5rem) 0 0;
+  padding: clamp(1.75rem, 4vw, 2.5rem) 0;
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  display: grid;
+  gap: clamp(1.5rem, 4vw, 2rem);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  text-align: center;
+}
+
+@media (min-width: 52rem) {
+  .stats { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+}
+
+.stat__value {
+  margin: 0;
+  font-size: clamp(1.9rem, 6vw, 2.6rem);
+  font-weight: 700;
+  line-height: 1.15;
   color: var(--accent);
   font-variant-numeric: tabular-nums;
 }
 
-.result__title { margin: 0 0 .5rem; font-size: 1rem; }
-
-.result__detail {
-  margin: 0;
-  font-size: .9rem;
-  line-height: 1.8;
+.stat__label {
+  margin: .5rem 0 0;
+  font-size: .84rem;
+  line-height: 1.6;
   color: var(--text-muted);
 }
-
-.result__quote {
-  margin: .9rem 0 0;
-  padding: 0 0 0 1rem;
-  border-left: 2px solid var(--border);
-  font-size: .9rem;
-  line-height: 1.8;
-  color: var(--text-muted);
-}
-.result__quote p { margin: 0; }
-.result__quote footer { margin-top: .4rem; font-size: .82rem; }
 
 /* ------------------------------------------------------- 聯絡方式 --- */
+
+/* 聯絡資訊在左、QR 在右；窄螢幕上下排 */
+.contact__grid {
+  display: grid;
+  gap: clamp(1.75rem, 4vw, 3rem);
+  grid-template-columns: 1fr;
+  align-items: start;
+}
+
+@media (min-width: 46rem) {
+  .contact__grid { grid-template-columns: minmax(0, 1fr) 13rem; }
+}
+
+.qr {
+  margin: 0;
+  justify-self: center;
+  max-width: 13rem;
+  width: 100%;
+  text-align: center;
+}
+
+/* QR 一定要白底：深色模式下若透出深色，掃描器會讀不到 */
+.qr__img {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 1;
+  padding: .6rem;
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+.qr__caption {
+  margin-top: .7rem;
+  display: grid;
+  gap: .15rem;
+}
+
+.qr__label {
+  font-size: .82rem;
+  font-weight: 700;
+  letter-spacing: .06em;
+  color: var(--text);
+}
+
+.qr__note { font-size: .78rem; color: var(--text-muted); }
 
 .contact {
   list-style: none;

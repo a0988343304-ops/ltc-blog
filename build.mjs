@@ -481,6 +481,7 @@ ${content}
 </main>
 ${footerBlock(hero)}
 <script src="${ver(`${up}assets/js/counter.js`)}" defer></script>
+${pageSlug === 'results' ? `<script src="${ver(`${up}assets/js/stats.js`)}" defer></script>` : ''}
 </body>
 </html>
 `;
@@ -655,38 +656,108 @@ ${items
  * 刻意在沒有資料時輸出「待補」而不是編一個看起來合理的數字——
  * 這一區會被潛在客戶與公部門當成事實查看，寧可空著也不能捏造。
  */
-function resultsBlock(heading = '') {
-  const items = site.results;
-  const lvl = heading ? 3 : 2;   // 同理，避免 h1 -> h3 跳階
+/**
+ * 顧問成果。
+ *
+ * 數字用 data-count-to 交給 JS 做捲到才跑的動畫，但 HTML 裡本來就寫著
+ * 最終值——沒有 JS、或使用者偏好減少動態時，看到的仍是正確數字。
+ */
+function resultsBlock() {
+  const r = site.resultsPage;
+  if (!r) {
+    return `
+      <section class="section" id="results">
+        <div class="wrap">
+          <p class="placeholder">此區待補。</p>
+        </div>
+      </section>`;
+  }
 
-  const body = Array.isArray(items) && items.length
-    ? `<ul class="results">
-${items
-  .map(
-    (r) => `            <li class="result">
-              ${r.metric ? `<p class="result__metric">${escapeHtml(r.metric)}</p>` : ''}
-              ${r.title ? `<h${lvl} class="result__title">${escapeHtml(r.title)}</h${lvl}>` : ''}
-              ${r.detail ? `<p class="result__detail">${escapeHtml(r.detail)}</p>` : ''}
-              ${r.quote ? `<blockquote class="result__quote"><p>${escapeHtml(r.quote)}</p>${r.source ? `<footer>— ${escapeHtml(r.source)}</footer>` : ''}</blockquote>` : ''}
-            </li>`,
-  )
-  .join('\n')}
-          </ul>`
-    : `<p class="placeholder">此區待補：輔導過的機構數量、改善的具體流程，以及合作單位的回饋。<br />內容確認後填入 <code>site.config.json</code> 的 <code>results</code>。</p>`;
+  const c = r.client || {};
 
   return `
       <section class="section" id="results">
         <div class="wrap">
-          ${heading ? `<h2 class="section__head">${escapeHtml(heading)}</h2>` : ''}
-          ${body}
+          <article class="client">
+            <h2 class="client__name">${escapeHtml(c.name || '')}</h2>
+            ${
+              c.role
+                ? `<p class="client__role"><span class="client__role-label">${escapeHtml(c.roleLabel || '合作角色')}</span>${escapeHtml(c.role)}</p>`
+                : ''
+            }
+            ${c.summary ? `<p class="client__summary">${escapeHtml(c.summary)}</p>` : ''}
+          </article>
+
+          ${
+            Array.isArray(r.achievements) && r.achievements.length
+              ? `<h3 class="subhead">${escapeHtml(r.achievementsHeading || '顧問成果')}</h3>
+          <ul class="checks">
+${r.achievements.map((t) => `            <li>${escapeHtml(t)}</li>`).join('\n')}
+          </ul>`
+              : ''
+          }
+
+          ${
+            Array.isArray(r.work) && r.work.length
+              ? `<h3 class="subhead">${escapeHtml(r.workHeading || '我的工作內容')}</h3>
+          <ul class="chips">
+${r.work.map((t) => `            <li>${escapeHtml(t)}</li>`).join('\n')}
+          </ul>`
+              : ''
+          }
+
+          ${
+            Array.isArray(r.belief) && r.belief.length
+              ? `<h3 class="subhead">${escapeHtml(r.beliefHeading || '我相信')}</h3>
+          <blockquote class="belief">
+${r.belief.map((t) => `            <p>${escapeHtml(t)}</p>`).join('\n')}
+          </blockquote>`
+              : ''
+          }
+
+          ${
+            Array.isArray(r.stats) && r.stats.length
+              ? `<ul class="stats">
+${r.stats
+  .map(
+    (s) => `            <li class="stat">
+              <p class="stat__value" data-count-to="${Number(s.value)}" data-suffix="${escapeHtml(s.suffix || '')}">${Number(s.value).toLocaleString('en-US')}${escapeHtml(s.suffix || '')}</p>
+              <p class="stat__label">${escapeHtml(s.label)}</p>
+            </li>`,
+  )
+  .join('\n')}
+          </ul>`
+              : ''
+          }
+
+          ${r.closing ? `<p class="motto">${escapeHtml(r.closing)}</p>` : ''}
         </div>
       </section>`;
 }
 
 /** 聯絡方式。同樣不編造——沒填就顯示待補。 */
-function contactBlock(heading = '') {
+function contactBlock(heading = '', up = '../') {
   const c = site.contact || {};
   const items = Array.isArray(c.items) ? c.items : [];
+  const q = c.qr;
+
+  const qrBlock = q?.image
+    ? `<figure class="qr">
+            <img
+              class="qr__img"
+              src="${escapeHtml(assetVer(up + q.image))}"
+              alt="${escapeHtml(q.alt || '')}"
+              width="${Number(q.size) || 600}"
+              height="${Number(q.size) || 600}"
+              loading="lazy"
+              decoding="async"
+            />
+            <figcaption class="qr__caption">
+              <span class="qr__label">${escapeHtml(q.label || 'LINE')}</span>
+              ${q.note ? `<span class="qr__note">${escapeHtml(q.note)}</span>` : ''}
+            </figcaption>
+          </figure>`
+    : '';
 
   const body = items.length
     ? `<ul class="contact">
@@ -708,7 +779,10 @@ ${items
         <div class="wrap">
           ${heading ? `<h2 class="section__head">${escapeHtml(heading)}</h2>` : ''}
           ${c.intro ? `<p class="section__lede">${escapeHtml(c.intro)}</p>` : ''}
-          ${body}
+          <div class="contact__grid">
+            ${body}
+            ${qrBlock}
+          </div>
         </div>
       </section>`;
 }
@@ -980,8 +1054,8 @@ function standalonePages() {
     },
     {
       slug: 'results',
-      label: '合作成果',
-      description: '輔導過的機構、改善的流程與合作單位回饋。',
+      label: '顧問成果',
+      description: `${site.author}擔任長照機構營運暨評鑑顧問的實績：輔導社區式長照機構建立營運制度、評鑑準備與品質管理機制。`,
       body: resultsBlock(),
     },
     {

@@ -35,7 +35,7 @@
     { "id": "about", "label": "關於我" },
     { "id": "services", "label": "我的服務" },
     { "id": "articles", "label": "全部文章" },
-    { "id": "results", "label": "合作成果" },
+    { "id": "results", "label": "顧問成果" },
     { "id": "contact", "label": "聯絡方式" }
   ],
 
@@ -120,12 +120,59 @@
     }
   ],
 
-  "_results_note": "以下為版位範例。請替換成真實的合作成果——機構數量、改善的具體流程、可具名或匿名的回饋。未經查證的數字不要放。",
-  "results": [],
+  "resultsPage": {
+    "client": {
+      "name": "好日和健康股份有限公司（日月光集團）",
+      "roleLabel": "合作角色",
+      "role": "長照機構營運暨評鑑顧問",
+      "summary": "自擔任好日和健康股份有限公司顧問以來，協助社區式長照機構建立營運制度、評鑑準備及品質管理機制，陪伴機構從日常管理到評鑑執行，建立符合實務需求的營運流程。"
+    },
+    "achievementsHeading": "顧問成果",
+    "achievements": [
+      "輔導 4 間社區式長照機構",
+      "協助建立營運管理制度與評鑑準備流程",
+      "輔導機構取得評鑑優異合格成績",
+      "建立符合第一線需求之 SOP、文件管理與品質管理機制",
+      "獲得機構主管及團隊高度肯定，持續擔任長期合作顧問"
+    ],
+    "workHeading": "我的工作內容",
+    "work": [
+      "社區式長照機構營運管理",
+      "評鑑制度建立與模擬評鑑",
+      "文件制度規劃",
+      "SOP 建立",
+      "教育訓練",
+      "品質管理",
+      "問題分析與改善",
+      "管理者培力"
+    ],
+    "beliefHeading": "我相信",
+    "belief": [
+      "好的評鑑，來自每天好的營運，而不是評鑑前兩個月的衝刺。",
+      "我的角色，不只是協助機構通過評鑑，而是陪伴團隊建立可以持續運作、持續改善的管理文化。"
+    ],
+    "stats": [
+      { "value": 4, "suffix": "+", "label": "合作機構" },
+      { "value": 100, "suffix": "%", "label": "評鑑優異合格" },
+      { "value": 10, "suffix": "+", "label": "累積顧問主題" },
+      { "value": 1000, "suffix": "+", "label": "投入長照服務時數" }
+    ],
+    "closing": "真正的成果，不是通過一次評鑑，而是建立一套能持續提升品質的營運管理系統。"
+  },
 
   "contact": {
     "intro": "歡迎機構、學校與公部門洽談合作。",
-    "items": []
+    "items": [
+      { "label": "Email", "value": "a0988343304@gmail.com", "href": "mailto:a0988343304@gmail.com" },
+      { "label": "電話", "value": "0988-343-304", "href": "tel:+886988343304" }
+    ],
+    "qr": {
+      "label": "LINE",
+      "image": "assets/img/line-qr.webp",
+      "size": 600,
+      "alt": "顏和平的 LINE 官方帳號 QR Code，用 LINE 掃描即可加入好友。",
+      "note": "用 LINE 掃描加入好友"
+    }
   },
   "counter": {
     "apiBase": "https://ltc-blog.pages.dev"
