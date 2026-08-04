@@ -1,5 +1,5 @@
 {
-  "title": "長照機構營運管理",
+  "title": "顏和平｜長照營運與評鑑顧問",
   "tagline": "從人力、法規到日常流程，把機構經營的每一件事講清楚",
   "shortTagline": "機構經營實務筆記",
   "description": "聚焦台灣長照機構的營運管理實務：人力配置、法規遵循、品質稽核、成本結構與日常流程改善。",
@@ -24,7 +24,7 @@
     "name": "顏和平",
     "field": "長照不只靠經驗，更靠方法",
     "role": "仁德醫護管理專科學校高齡健康促進科專案講師",
-    "positioning": "讓長照機構經營更有方向，評鑑準備不再只是摸索。",
+    "positioning": "從第一線到管理，建立可複製、可傳承的長照 Know-how。",
     "photo": "assets/img/portrait-yen-560.webp",
     "photoSmall": "assets/img/portrait-yen-280.webp",
     "photoAlt": "顏和平的形象照，穿條紋襯衫站在灰色背景前。",
@@ -34,12 +34,12 @@
   "nav": [
     { "id": "about", "label": "關於我" },
     { "id": "services", "label": "我的服務" },
+    { "id": "articles", "label": "全部文章" },
     { "id": "results", "label": "合作成果" },
-    { "id": "contact", "label": "聯絡方式" },
-    { "id": "articles", "label": "文章" }
+    { "id": "contact", "label": "聯絡方式" }
   ],
 
-  "homeLatestCount": 4,
+  "homeLatestCount": 3,
 
   "about": [
     {

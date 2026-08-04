@@ -556,6 +556,13 @@ h1, h2, h3, h4 {
   .cards { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 
+/* 首頁最多放三篇，排成一列比兩張大卡收斂。
+   用 auto-fit 而非固定三欄：文章只有兩篇時會填滿兩欄，
+   不會空一格出來看起來像少了東西。 */
+@media (min-width: 58rem) {
+  .page-home .cards { grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr)); }
+}
+
 .card {
   min-width: 0;              /* grid 子元素允許收縮 */
   background: var(--surface);

@@ -835,8 +835,8 @@ ${body}`;
 function renderArticles(posts) {
   return renderStandalone({
     slug: 'articles',
-    label: '文章',
-    description: `${site.title}的全部文章，共 ${posts.length} 篇。`,
+    label: '全部文章',
+    description: `${site.author}的長照營運管理文章，共 ${posts.length} 篇。`,
     lede: `共 ${posts.length} 篇${contentUpdated ? `，內容最後更新 ${fmtDate(contentUpdated)}` : ''}。`,
     body: `
       <div class="wrap">
