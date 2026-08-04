@@ -57,8 +57,10 @@ html {
   -webkit-text-size-adjust: 100%;   /* iOS 橫置時不要自己放大字級 */
   text-size-adjust: 100%;
   scroll-behavior: smooth;
-  /* .topbar 是 sticky（min-height 3.5rem），錨點跳轉後目標會被它壓住 */
-  scroll-padding-top: 4.5rem;
+  /* .topbar 是 sticky，錨點跳轉後目標會被它壓住。
+     加了區塊導覽後，中等寬度時導覽會換到第二列，頁首最高約 90px，
+     所以留 6.5rem（104px）才蓋得住。桌機只是多一點上方留白，無妨。 */
+  scroll-padding-top: 6.5rem;
 }
 
 body {
@@ -177,6 +179,39 @@ h1, h2, h3, h4 {
   font-variant-numeric: tabular-nums;
 }
 
+/* 區塊導覽。窄螢幕時橫向捲動，不換行擠爆頁首。 */
+.topnav {
+  order: 3;                    /* 手機：換到第二列，桌機再拉回中間 */
+  flex-basis: 100%;
+  min-width: 0;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+.topnav::-webkit-scrollbar { display: none; }
+
+.topnav ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  gap: clamp(.9rem, 3vw, 1.6rem);
+  white-space: nowrap;
+}
+
+.topnav a {
+  display: inline-block;
+  padding-block: .2rem;
+  font-size: .88rem;
+  color: var(--text-muted);
+  text-decoration: none;
+}
+.topnav a:hover { color: var(--accent); text-decoration: underline; }
+
+@media (min-width: 52rem) {
+  .topnav { order: 0; flex-basis: auto; margin-inline: auto; }
+}
+
 /* ------------------------------------------------------------ HERO --- */
 
 .hero {
@@ -275,13 +310,13 @@ h1, h2, h3, h4 {
   letter-spacing: -.01em;
 }
 
-/* 領域名稱跟人名同在 h1 裡：人名建立信任、領域承接關鍵字 */
+/* 品牌宣言，跟人名同在 h1 裡：人名建立信任、宣言說清楚主張 */
 .profile__field {
   display: block;
-  margin-top: .3rem;
-  font-size: clamp(.95rem, 2.6vw, 1.1rem);
+  margin-top: .55rem;
+  font-size: clamp(1.05rem, 2.9vw, 1.25rem);
   font-weight: 600;
-  letter-spacing: .04em;
+  letter-spacing: .02em;
   color: var(--accent);
 }
 
@@ -299,55 +334,174 @@ h1, h2, h3, h4 {
   color: var(--text);
 }
 
-/* ------------------------------------------------- 首頁：為什麼選擇我 --- */
+/* ------------------------------------------------------- 首頁：區塊 --- */
 
-.why { padding-bottom: clamp(1.5rem, 5vw, 2.5rem); }
+/* 留白優先：區塊之間拉開距離，比塞滿資訊更像專業服務網站 */
+.section { padding-block: clamp(2.5rem, 7vw, 4.5rem); }
+.section + .section { padding-top: 0; }
 
-.why__head {
-  margin: 0 0 1.25rem;
-  font-size: 1.25rem;
-  text-align: center;
+.section__head {
+  margin: 0 0 .5rem;
+  font-size: clamp(1.15rem, 3vw, 1.4rem);
+  letter-spacing: .01em;
 }
 
-.why__list {
+/* 標題底下一道短線，比整條分隔線安靜 */
+.section__head::after {
+  content: "";
+  display: block;
+  width: 2.5rem;
+  height: 2px;
+  margin-top: .6rem;
+  background: var(--accent);
+  opacity: .55;
+}
+
+.section__lede {
+  margin: 0 0 1.5rem;
+  color: var(--text-muted);
+  font-size: .95rem;
+}
+
+.section__head + .tiles,
+.section__head + .results,
+.section__head + .placeholder { margin-top: 1.75rem; }
+
+/* 卡片：只用細框與大留白，不加彩色邊條 */
+.tiles {
   list-style: none;
   margin: 0;
   padding: 0;
   display: grid;
-  gap: var(--gap);
+  gap: clamp(1rem, 2.5vw, 1.5rem);
   grid-template-columns: 1fr;
 }
 
 @media (min-width: 46rem) {
-  .why__list { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .tiles { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 }
 
-.why__item {
+.tile {
   min-width: 0;
   background: var(--surface);
   border: 1px solid var(--border);
-  border-top: 3px solid var(--accent);
   border-radius: var(--radius);
-  box-shadow: var(--shadow);
-  padding: clamp(1rem, 3vw, 1.35rem);
+  padding: clamp(1.25rem, 3.2vw, 1.75rem);
 }
 
-.why__title { margin: 0 0 .5rem; font-size: 1.02rem; }
+.tile__title {
+  margin: 0 0 .6rem;
+  font-size: 1rem;
+  line-height: 1.5;
+}
 
-.why__detail {
+.tile__detail {
   margin: 0;
   font-size: .9rem;
-  line-height: 1.75;
+  line-height: 1.8;
   color: var(--text-muted);
 }
 
-.motto {
-  margin: clamp(1.75rem, 5vw, 2.5rem) 0 0;
-  text-align: center;
-  font-size: clamp(1.15rem, 3.4vw, 1.5rem);
+/* ------------------------------------------------------- 合作成果 --- */
+
+.results {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: clamp(1rem, 2.5vw, 1.5rem);
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 46rem) {
+  .results { grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr)); }
+}
+
+.result {
+  min-width: 0;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: clamp(1.25rem, 3.2vw, 1.75rem);
+}
+
+.result__metric {
+  margin: 0 0 .35rem;
+  font-size: clamp(1.6rem, 4.5vw, 2.1rem);
   font-weight: 700;
-  line-height: 1.6;
+  line-height: 1.2;
   color: var(--accent);
+  font-variant-numeric: tabular-nums;
+}
+
+.result__title { margin: 0 0 .5rem; font-size: 1rem; }
+
+.result__detail {
+  margin: 0;
+  font-size: .9rem;
+  line-height: 1.8;
+  color: var(--text-muted);
+}
+
+.result__quote {
+  margin: .9rem 0 0;
+  padding: 0 0 0 1rem;
+  border-left: 2px solid var(--border);
+  font-size: .9rem;
+  line-height: 1.8;
+  color: var(--text-muted);
+}
+.result__quote p { margin: 0; }
+.result__quote footer { margin-top: .4rem; font-size: .82rem; }
+
+/* ------------------------------------------------------- 聯絡方式 --- */
+
+.contact {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: .85rem;
+  max-width: var(--content);
+}
+
+.contact__item {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: .35rem 1rem;
+  padding-bottom: .85rem;
+  border-bottom: 1px solid var(--border);
+}
+.contact__item:last-child { border-bottom: 0; padding-bottom: 0; }
+
+.contact__label {
+  flex: 0 0 5.5rem;
+  font-size: .82rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  letter-spacing: .04em;
+}
+
+.contact__value { min-width: 0; overflow-wrap: anywhere; }
+
+/* 尚未填入真實內容的版位。刻意做得明顯，避免誤上線。 */
+.placeholder {
+  margin: 0;
+  padding: clamp(1.25rem, 3.2vw, 1.75rem);
+  background: var(--bg-soft);
+  border: 1px dashed var(--border);
+  border-radius: var(--radius);
+  color: var(--text-muted);
+  font-size: .9rem;
+  line-height: 1.85;
+}
+.placeholder code {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: .05rem .35rem;
+  font-size: .88em;
 }
 
 /* ---------------------------------------------------------- 文章列表 --- */

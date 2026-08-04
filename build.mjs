@@ -462,6 +462,7 @@ ${head}
 <header class="topbar">
   <div class="wrap topbar__inner">
     <a class="topbar__brand" href="${up || './'}">${escapeHtml(site.title)}</a>
+    ${navBlock(up)}
     <span class="topbar__views">
       <span class="sr-only">全站累計</span>本站瀏覽 ${viewsSlot('site-home')}
     </span>
@@ -585,29 +586,108 @@ function profileBlock() {
             ${p.positioning ? `<p class="profile__lede">${escapeHtml(p.positioning)}</p>` : ''}
           </div>
         </div>
-      </section>${whyBlock()}`;
+      </section>`;
 }
 
-/** 「為什麼選擇我」＋品牌宣言。內容全部來自 site.config.json，改字不必動程式。 */
-function whyBlock() {
-  const p = site.profile;
-  if (!Array.isArray(p?.why) || !p.why.length) return '';
+/**
+ * 頁首的區塊導覽。
+ * 首頁用純錨點（#about），文章頁要先回首頁再跳（../#about）。
+ */
+function navBlock(up) {
+  const items = site.nav;
+  if (!Array.isArray(items) || !items.length) return '';
+
+  return `<nav class="topnav" aria-label="頁面區塊">
+      <ul>
+${items
+  .map(
+    (n) => `        <li><a href="${up}#${escapeHtml(n.id)}">${escapeHtml(n.label)}</a></li>`,
+  )
+  .join('\n')}
+      </ul>
+    </nav>`;
+}
+
+/** 卡片式區塊（關於我、我的服務）。內容全部來自 site.config.json。 */
+function cardSection(id, heading, items) {
+  if (!Array.isArray(items) || !items.length) return '';
 
   return `
-      <section class="why">
+      <section class="section" id="${escapeHtml(id)}">
         <div class="wrap">
-          <h2 class="why__head">${escapeHtml(p.whyHeading || '為什麼選擇我')}</h2>
-          <ul class="why__list">
-${p.why
+          <h2 class="section__head">${escapeHtml(heading)}</h2>
+          <ul class="tiles">
+${items
   .map(
-    (w) => `            <li class="why__item">
-              <h3 class="why__title">${escapeHtml(w.title)}</h3>
-              ${w.detail ? `<p class="why__detail">${escapeHtml(w.detail)}</p>` : ''}
+    (w) => `            <li class="tile">
+              <h3 class="tile__title">${escapeHtml(w.title)}</h3>
+              ${w.detail ? `<p class="tile__detail">${escapeHtml(w.detail)}</p>` : ''}
             </li>`,
   )
   .join('\n')}
           </ul>
-          ${p.motto ? `<p class="motto">${escapeHtml(p.motto)}</p>` : ''}
+        </div>
+      </section>`;
+}
+
+/**
+ * 合作成果。
+ * 刻意在沒有資料時輸出「待補」而不是編一個看起來合理的數字——
+ * 這一區會被潛在客戶與公部門當成事實查看，寧可空著也不能捏造。
+ */
+function resultsBlock() {
+  const items = site.results;
+
+  const body = Array.isArray(items) && items.length
+    ? `<ul class="results">
+${items
+  .map(
+    (r) => `            <li class="result">
+              ${r.metric ? `<p class="result__metric">${escapeHtml(r.metric)}</p>` : ''}
+              ${r.title ? `<h3 class="result__title">${escapeHtml(r.title)}</h3>` : ''}
+              ${r.detail ? `<p class="result__detail">${escapeHtml(r.detail)}</p>` : ''}
+              ${r.quote ? `<blockquote class="result__quote"><p>${escapeHtml(r.quote)}</p>${r.source ? `<footer>— ${escapeHtml(r.source)}</footer>` : ''}</blockquote>` : ''}
+            </li>`,
+  )
+  .join('\n')}
+          </ul>`
+    : `<p class="placeholder">此區待補：輔導過的機構數量、改善的具體流程，以及合作單位的回饋。<br />內容確認後填入 <code>site.config.json</code> 的 <code>results</code>。</p>`;
+
+  return `
+      <section class="section" id="results">
+        <div class="wrap">
+          <h2 class="section__head">合作成果</h2>
+          ${body}
+        </div>
+      </section>`;
+}
+
+/** 聯絡方式。同樣不編造——沒填就顯示待補。 */
+function contactBlock() {
+  const c = site.contact || {};
+  const items = Array.isArray(c.items) ? c.items : [];
+
+  const body = items.length
+    ? `<ul class="contact">
+${items
+  .map(
+    (i) => `            <li class="contact__item">
+              <span class="contact__label">${escapeHtml(i.label)}</span>
+              ${i.href
+                ? `<a class="contact__value" href="${escapeHtml(i.href)}"${/^https?:/.test(i.href) ? ' target="_blank" rel="noopener noreferrer"' : ''}>${escapeHtml(i.value)}</a>`
+                : `<span class="contact__value">${escapeHtml(i.value)}</span>`}
+            </li>`,
+  )
+  .join('\n')}
+          </ul>`
+    : `<p class="placeholder">此區待補：希望公開的聯絡方式（Email、電話、LINE 或表單連結）。<br />確認後填入 <code>site.config.json</code> 的 <code>contact.items</code>。</p>`;
+
+  return `
+      <section class="section section--contact" id="contact">
+        <div class="wrap">
+          <h2 class="section__head">聯絡方式</h2>
+          ${c.intro ? `<p class="section__lede">${escapeHtml(c.intro)}</p>` : ''}
+          ${body}
         </div>
       </section>`;
 }
@@ -615,7 +695,11 @@ ${p.why
 function renderIndex(posts) {
   const newest = contentUpdated;
 
-  const content = `${profileBlock()}
+  const content = `${profileBlock()}${cardSection('about', '關於我', site.about)}${cardSection(
+    'services',
+    '我的服務',
+    site.services,
+  )}${resultsBlock()}${contactBlock()}
       <div class="wrap">
         <section class="listing">
           <div class="listing__head">
