@@ -12,19 +12,6 @@
     "height": 630,
     "alt": "顏和平，長照機構營運與評鑑顧問"
   },
-  "hero": {
-    "src": "assets/img/hero-geriatrics-center.jpg",
-    "alt": "國家衛生研究院國家高齡醫學暨健康福祉研究中心的建築外觀與前方廣場",
-    "width": 1920,
-    "height": 1240,
-    "workTitle": "National Center for Geriatrics and Welfare Research, NHRI",
-    "creator": "中華民國總統府",
-    "creatorEn": "Wang Yu Ching / Office of the President",
-    "license": "CC BY 4.0",
-    "licenseUrl": "https://creativecommons.org/licenses/by/4.0/",
-    "sourceUrl": "https://commons.wikimedia.org/wiki/File:2026.05.01_National_Center_for_Geriatrics_and_Welfare_Research,_NHRI_02.jpg",
-    "modified": false
-  },
   "profile": {
     "name": "顏和平",
     "headline": "長照機構營運與評鑑顧問",
@@ -42,7 +29,10 @@
     "photo": "assets/img/portrait-yen-560.webp",
     "photoSmall": "assets/img/portrait-yen-280.webp",
     "photoAlt": "顏和平的形象照，穿條紋襯衫站在灰色背景前。",
-    "photoSize": 560
+    "photoSize": 560,
+    "sameAs": [
+      "https://ghp.jente.edu.tw/%E7%A7%91%E7%B3%BB%E5%B8%AB%E8%B3%87/"
+    ]
   },
   "nav": [
     {
@@ -365,5 +355,29 @@
   },
   "counter": {
     "apiBase": "https://ltc-blog.pages.dev"
+  },
+  "externalLinks": {
+    "heading": "外部連結",
+    "lede": "刊登於外部媒體的文章與對外授課紀錄。",
+    "items": [
+      {
+        "title": "解構日照評鑑痛點：如何從「事件中心」走向「服務中心」的日常營運管理？",
+        "site": "創新照顧",
+        "url": "https://www.ankecare.com/article/4571-2026-07-27-10-40-23",
+        "note": "專欄文章"
+      },
+      {
+        "title": "AI 賦能日照管理實戰班",
+        "site": "侒可創新照顧管理學院",
+        "url": "https://www.ankecare.com/event/164-2026-07-22-02-51-07",
+        "note": "課程講師"
+      },
+      {
+        "title": "仁德醫護管理專科學校 高齡健康促進科 師資陣容",
+        "site": "仁德醫護管理專科學校",
+        "url": "https://ghp.jente.edu.tw/%E7%A7%91%E7%B3%BB%E5%B8%AB%E8%B3%87/",
+        "note": "專案講師"
+      }
+    ]
   }
 }

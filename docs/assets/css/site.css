@@ -595,6 +595,37 @@ h1, h2, h3, h4 {
 .story__mission span { display: inline-block; }
 .story__mission { max-width: none; text-wrap: pretty; }
 
+/* ------------------------------------------------------- 外部連結 --- */
+
+.external__list {
+  list-style: none;
+  margin: clamp(1.5rem, 4vw, 2rem) auto 0;
+  padding: 0;
+  max-width: var(--content);
+  display: grid;
+  gap: 0;
+}
+
+.external__item {
+  padding-block: 1rem;
+  border-bottom: 1px solid var(--border);
+}
+.external__item:last-child { border-bottom: 0; }
+
+.external__item a {
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1.7;
+}
+
+.external__meta {
+  margin: .35rem 0 0;
+  font-size: .82rem;
+  color: var(--text-muted);
+}
+
+.external__site { font-weight: 600; }
+
 /* --------------------------------------------------- 團隊領導成果 --- */
 
 .leadership__inner {

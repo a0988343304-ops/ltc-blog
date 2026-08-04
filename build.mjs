@@ -281,7 +281,8 @@ async function loadPosts() {
  * 文章 front matter 給了 heroImage 就用自己的，否則沿用站台預設圖。
  */
 function heroFor(post) {
-  if (!post?.heroImage) return site.hero;
+  // 站台層級的預設主圖已移除，沒設 heroImage 就是沒有主圖
+  if (!post?.heroImage) return null;
 
   const widths = post.heroSrcsetWidths?.length ? post.heroSrcsetWidths : undefined;
   // stem 是「不含尺寸後綴與副檔名」的檔名主幹，srcset 的候選檔名都由它組出來。
@@ -311,12 +312,26 @@ function heroFor(post) {
  * 路徑會回 200 但內容是首頁 HTML，瀏覽器拿到 HTML 當圖片，靜靜地壞掉。
  */
 function heroBlock({ eyebrow, title, lede, hero, up = '', zoom = false }) {
-  const h = hero || site.hero;
+  const h = hero;
+
+  // 沒有主圖就只輸出文字區。站台層級的預設主圖已移除（那是一張沒人引用的
+  // CC BY 素材），文章若沒設 heroImage，就是單純沒有主視覺，不該硬湊一張。
+  if (!h?.src) {
+    return `
+      <section class="hero">
+        <div class="hero__text">
+          ${eyebrow ? `<p class="hero__eyebrow">${escapeHtml(eyebrow)}</p>` : ''}
+          <h1 class="hero__title">${escapeHtml(title)}</h1>
+          ${lede ? `<p class="hero__lede">${escapeHtml(lede)}</p>` : ''}
+        </div>
+      </section>`;
+  }
+
   const src = escapeHtml(assetVer(up + h.src));
 
   // LCP 圖：CSS 把寬度壓在 42rem，手機只需要幾百 px 寬的來源。
-  // 給 srcset 讓瀏覽器挑合適的尺寸，別再讓 375px 的螢幕下載 1920px 的原圖。
-  const widths = h.srcsetWidths || site.hero?.srcsetWidths;
+  // 給 srcset 讓瀏覽器挑合適的尺寸，別再讓 375px 的螢幕下載原圖。
+  const widths = h.srcsetWidths;
   const stem = h.stem || String(h.src).replace(/\.[^./]+$/, '');
   const srcset = Array.isArray(widths) && widths.length
     ? escapeHtml(widths.map((w) => `${assetVer(`${up}${stem}-${w}.webp`)} ${w}w`).join(', '))
@@ -478,7 +493,7 @@ function layout({
   // 直接 hero || site.hero 會拿到一個沒有 src 的物件，輸出 /undefined。
   // 沒有可用主圖時一律退回專門做的社群卡片 assets/img/og-card.jpg：
   // 1200×630 是各平台的建議尺寸，也不會誤用文章頁才該掛出處的 CC BY 素材。
-  const h = (hero && hero.src) ? hero : (site.ogImage || site.hero);
+  const h = (hero && hero.src) ? hero : site.ogImage;
   const ogImage = (origin && h && h.src)
     ? `${origin}/${String(h.src).replace(/^\/+/, '')}`
     : '';
@@ -571,8 +586,9 @@ ${posts
     const eager = eagerFirst && idx === 0;
 
     // 卡片縮圖。up 是回站台根目錄的前綴：首頁 ''、/articles/ 是 '../'。
-    const thumbWidths = h.srcsetWidths || site.hero?.srcsetWidths;
-    const thumbStem = h.stem || String(h.src).replace(/\.[^./]+$/, '');
+    // 文章沒有主圖時就不輸出縮圖，卡片只有文字。
+    const thumbWidths = h?.srcsetWidths;
+    const thumbStem = h?.stem || (h?.src ? String(h.src).replace(/\.[^./]+$/, '') : '');
     const thumbSrcset = Array.isArray(thumbWidths) && thumbWidths.length
       ? escapeHtml(thumbWidths.map((w) => `${assetVer(`${up}${thumbStem}-${w}.webp`)} ${w}w`).join(', '))
       : '';
@@ -580,7 +596,8 @@ ${posts
     // alt 留空：縮圖對這張卡而言是裝飾，內容由緊接著的標題承載。
     // 放 alt 會讓螢幕閱讀器在每個標題前先念一整段圖片描述。
     // 連結重複指向同一篇，用 tabindex="-1" + aria-hidden 避免多一個 Tab 停留點。
-    const thumb = `<a class="card__thumb" href="${escapeHtml(up + p.slug)}/" tabindex="-1" aria-hidden="true">
+    const thumb = h?.src
+      ? `<a class="card__thumb" href="${escapeHtml(up + p.slug)}/" tabindex="-1" aria-hidden="true">
               <img
                 src="${escapeHtml(assetVer(up + h.src))}"${thumbSrcset ? `
                 srcset="${thumbSrcset}"
@@ -590,7 +607,8 @@ ${posts
                 height="${h.height}"
                 ${eager ? 'fetchpriority="high" decoding="async"' : 'loading="lazy" decoding="async"'}
               />
-            </a>`;
+            </a>`
+      : '';
 
     return `        <li class="card">
           <article>
@@ -1370,6 +1388,36 @@ ${l.paragraphs.map((t) => `              <p>${escapeHtml(t)}</p>`).join('\n')}
       </section>`;
 }
 
+/**
+ * 外部連結（關於我）。
+ * 刊在別人網站上的作品與授課紀錄，對讀者是佐證，
+ * 對搜尋引擎也是「這個人在站外真的存在」的關聯訊號。
+ */
+function externalLinksBlock() {
+  const e = site.externalLinks;
+  if (!Array.isArray(e?.items) || !e.items.length) return '';
+
+  return `
+      <section class="section external">
+        <div class="wrap">
+          <h2 class="section__head section__head--center">${escapeHtml(e.heading || '外部連結')}</h2>
+          ${e.lede ? `<p class="section__lede section__lede--center">${escapeHtml(e.lede)}</p>` : ''}
+          <ul class="external__list">
+${e.items
+  .map(
+    (i) => `            <li class="external__item">
+              <a href="${escapeHtml(i.url)}" target="_blank" rel="noopener noreferrer" aria-describedby="newtab-note">${escapeHtml(i.title)}</a>
+              <p class="external__meta">
+                <span class="external__site">${escapeHtml(i.site)}</span>${i.note ? `<span class="dot" aria-hidden="true">·</span><span>${escapeHtml(i.note)}</span>` : ''}
+              </p>
+            </li>`,
+  )
+  .join('\n')}
+          </ul>
+        </div>
+      </section>`;
+}
+
 function storyBlock(up = '../') {
   const s = site.aboutStory;
   if (!s) return '';
@@ -1434,7 +1482,7 @@ function standalonePages() {
       // 型別升為 ProfilePage，mainEntity 掛上唯一一份展開的 Person 節點。
       pageType: 'ProfilePage',
       mainEntity: personNode(true),
-      body: `${storyBlock()}${leadershipBlock()}${journeyBlock()}${cardSection('about', '專業定位', site.about, { center: true })}`,
+      body: `${storyBlock()}${leadershipBlock()}${journeyBlock()}${cardSection('about', '專業定位', site.about, { center: true })}${externalLinksBlock()}`,
     },
     {
       slug: 'services',
