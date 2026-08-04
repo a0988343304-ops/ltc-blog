@@ -1339,6 +1339,81 @@ h1, h2, h3, h4 {
   margin-block: -.3rem;
 }
 
+/* ------------------------------------------------------- 分享列 --- */
+
+.share {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: .6rem;
+  margin: clamp(2rem, 5vw, 2.75rem) 0 0;
+  padding-top: clamp(1.25rem, 3.5vw, 1.75rem);
+  border-top: 1px solid var(--border);
+}
+
+.share__label {
+  font-size: .84rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  margin-right: .2rem;
+}
+
+/* 命中框 ≥ 40px：手指按得到，也符合觸控目標的無障礙建議 */
+.share__btn {
+  display: inline-flex;
+  align-items: center;
+  gap: .4rem;
+  min-height: 2.5rem;
+  padding: .45rem .9rem;
+  font: inherit;
+  font-size: .85rem;
+  font-weight: 600;
+  color: var(--text);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.share__btn:hover {
+  color: var(--accent);
+  border-color: var(--accent);
+  text-decoration: none;
+}
+
+.share__btn svg { width: 1.05rem; height: 1.05rem; flex: 0 0 auto; }
+
+.share__status {
+  font-size: .82rem;
+  font-weight: 600;
+  color: var(--accent);
+}
+
+/* 複製失敗時才由 JS 插入：把網址攤出來讓人自己選 */
+.share__fallback {
+  flex-basis: 100%;
+  display: grid;
+  gap: .35rem;
+  margin-top: .5rem;
+}
+
+.share__fallback label {
+  font-size: .8rem;
+  color: var(--text-muted);
+}
+
+.share__fallback input {
+  width: 100%;
+  font: inherit;
+  font-size: .85rem;
+  padding: .5rem .7rem;
+  color: var(--text);
+  background: var(--bg-soft);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+
 .post__back {
   margin: 2rem 0 0;
   font-size: .93rem;

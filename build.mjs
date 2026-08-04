@@ -560,6 +560,7 @@ ${footerBlock(hero, up)}
 <script src="${ver(`${up}assets/js/counter.js`)}" defer></script>
 ${pageSlug === 'results' ? `<script src="${ver(`${up}assets/js/stats.js`)}" defer></script>` : ''}
 ${pageSlug === 'contact' ? `<script src="${ver(`${up}assets/js/email.js`)}" defer></script>` : ''}
+${bodyClass === 'page-post' ? `<script src="${ver(`${up}assets/js/share.js`)}" defer></script>` : ''}
 </body>
 </html>
 `;
@@ -1546,6 +1547,52 @@ function standalonePages() {
   ];
 }
 
+/**
+ * 分享列。
+ *
+ * Facebook 與 LINE 用純分享網址，**不嵌任何官方 SDK**——
+ * 嵌 SDK 等於讓對方在自己的網站上追蹤每一位訪客，代價遠大於便利。
+ * 純連結沒有 JS、沒有追蹤，也照樣能用。
+ *
+ * 「複製連結」必須有 JS 才有作用，所以預設 hidden，由 share.js 打開；
+ * 沒有 JS 的訪客不會看到一顆按了沒反應的按鈕。
+ */
+function shareBlock(post) {
+  if (!origin) return '';
+
+  const url = `${origin}/${post.slug}/`;
+  const u = encodeURIComponent(url);
+  const t = encodeURIComponent(post.title);
+
+  const icon = (paths) =>
+    `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">${paths}</svg>`;
+
+  const clip = icon(
+    '<path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/>',
+  );
+  const fb = icon(
+    '<path d="M17 2h-3a5 5 0 0 0-5 5v3H6v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/>',
+  );
+  const line = icon(
+    '<path d="M21 10.4c0-4.1-4-7.4-9-7.4S3 6.3 3 10.4c0 3.6 3.2 6.7 7.5 7.3.3.1.7.2.8.5.1.3.1.6 0 .9l-.1.8c0 .3-.2 1 .9.5s5.7-3.4 7.7-5.8h0A6.6 6.6 0 0 0 21 10.4z"/>',
+  );
+
+  return `
+          <div class="share">
+            <span class="share__label">分享這篇</span>
+            <button type="button" class="share__btn" data-share-url="${escapeHtml(url)}" hidden>
+              ${clip}<span>複製連結</span>
+            </button>
+            <a class="share__btn" href="https://www.facebook.com/sharer/sharer.php?u=${u}" target="_blank" rel="noopener noreferrer" aria-describedby="newtab-note">
+              ${fb}<span>Facebook</span>
+            </a>
+            <a class="share__btn" href="https://social-plugins.line.me/lineit/share?url=${u}&amp;text=${t}" target="_blank" rel="noopener noreferrer" aria-describedby="newtab-note">
+              ${line}<span>LINE</span>
+            </a>
+            <span class="share__status" role="status" aria-live="polite"></span>
+          </div>`;
+}
+
 function reprintNotice(post) {
   if (!post.originalUrl) return '';
   const site_ = post.originalSite || '原刊媒體';
@@ -1623,6 +1670,7 @@ ${reprintNotice(post)}
           <div class="prose">
 ${post.html}
           </div>
+${shareBlock(post)}
 ${otherPostsBlock(post, posts)}
           <p class="post__back"><a href="../articles/"><span aria-hidden="true">←</span> 回到文章列表</a></p>
         </article>
