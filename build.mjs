@@ -745,7 +745,7 @@ ${r.stats
               : ''
           }
 
-          ${r.closing ? `<p class="motto">${escapeHtml(r.closing)}</p>` : ''}
+          ${r.closing ? `<p class="motto">${clauses(r.closing)}</p>` : ''}
         </div>
       </section>`;
 }
