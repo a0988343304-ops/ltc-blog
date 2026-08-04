@@ -1223,7 +1223,10 @@ function renderStandalone({
   const content = `
       <section class="page-head">
         <div class="wrap">
-          ${crumbsNav(crumbs)}
+          <div class="page-head__top">
+            ${crumbsNav(crumbs)}
+${share ? shareBlock({ url: pageUrl, title: `${label}｜${site.title}`, compact: true }) : ''}
+          </div>
           <h1 class="page-head__title">${escapeHtml(label)}</h1>
           ${lede ? `<p class="page-head__lede">${markEn(clauses(lede))}</p>` : ''}
         </div>
