@@ -482,6 +482,7 @@ ${content}
 ${footerBlock(hero)}
 <script src="${ver(`${up}assets/js/counter.js`)}" defer></script>
 ${pageSlug === 'results' ? `<script src="${ver(`${up}assets/js/stats.js`)}" defer></script>` : ''}
+${pageSlug === 'contact' ? `<script src="${ver(`${up}assets/js/email.js`)}" defer></script>` : ''}
 </body>
 </html>
 `;
@@ -778,12 +779,24 @@ function contactBlock(heading = '', up = '../') {
     ? `<ul class="contact">
 ${items
   .map(
-    (i) => `            <li class="contact__item">
+    (i) => {
+      // protect: true 的項目（Email）不以明文寫進 HTML。
+      // 收信箱的爬蟲絕大多數只是拿 \S+@\S+ 這種正規式掃原始碼，
+      // 原文改成 base64 就掃不到；JS 載入後再還原成可點的 mailto。
+      // 沒有 JS 時顯示人類看得懂、正規式抓不到的替代寫法。
+      const value = i.protect
+        ? `<span class="contact__value" data-email="${Buffer.from(String(i.value), 'utf8').toString('base64')}">${escapeHtml(
+            String(i.value).replace('@', '（at）').replace(/\.(?=[^.]*$)/, '（dot）'),
+          )}</span>`
+        : i.href
+          ? `<a class="contact__value" href="${escapeHtml(i.href)}"${/^https?:/.test(i.href) ? ' target="_blank" rel="noopener noreferrer"' : ''}>${escapeHtml(i.value)}</a>`
+          : `<span class="contact__value">${escapeHtml(i.value)}</span>`;
+
+      return `            <li class="contact__item">
               <span class="contact__label">${escapeHtml(i.label)}</span>
-              ${i.href
-                ? `<a class="contact__value" href="${escapeHtml(i.href)}"${/^https?:/.test(i.href) ? ' target="_blank" rel="noopener noreferrer"' : ''}>${escapeHtml(i.value)}</a>`
-                : `<span class="contact__value">${escapeHtml(i.value)}</span>`}
-            </li>`,
+              ${value}
+            </li>`;
+    },
   )
   .join('\n')}
           </ul>`

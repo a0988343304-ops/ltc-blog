@@ -163,7 +163,7 @@
   "contact": {
     "intro": "歡迎機構、學校與公部門洽談合作。",
     "items": [
-      { "label": "Email", "value": "a0988343304@gmail.com", "href": "mailto:a0988343304@gmail.com" },
+      { "label": "Email", "value": "a0988343304@gmail.com", "protect": true },
       { "label": "電話", "value": "0988-343-304", "href": "tel:+886988343304" }
     ],
     "qr": {
