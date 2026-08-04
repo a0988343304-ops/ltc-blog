@@ -1557,7 +1557,7 @@ function standalonePages() {
  * 「複製連結」必須有 JS 才有作用，所以預設 hidden，由 share.js 打開；
  * 沒有 JS 的訪客不會看到一顆按了沒反應的按鈕。
  */
-function shareBlock(post) {
+function shareBlock(post, { compact = false } = {}) {
   if (!origin) return '';
 
   const url = `${origin}/${post.slug}/`;
@@ -1577,17 +1577,23 @@ function shareBlock(post) {
     '<path d="M21 10.4c0-4.1-4-7.4-9-7.4S3 6.3 3 10.4c0 3.6 3.2 6.7 7.5 7.3.3.1.7.2.8.5.1.3.1.6 0 .9l-.1.8c0 .3-.2 1 .9.5s5.7-3.4 7.7-5.8h0A6.6 6.6 0 0 0 21 10.4z"/>',
   );
 
+  // 精簡版放在文章開頭的作者列右側，只有圖示；
+  // 圖示沒有文字標籤，可及名稱一律用 aria-label 補足，不能只靠 title。
+  const label = (text) =>
+    compact ? ` aria-label="${escapeHtml(text)}" title="${escapeHtml(text)}"` : '';
+  const text = (t2) => (compact ? '' : `<span>${escapeHtml(t2)}</span>`);
+
   return `
-          <div class="share">
-            <span class="share__label">分享這篇</span>
-            <button type="button" class="share__btn" data-share-url="${escapeHtml(url)}" hidden>
-              ${clip}<span>複製連結</span>
+          <div class="share${compact ? ' share--compact' : ''}">
+            ${compact ? '<span class="sr-only">分享這篇</span>' : '<span class="share__label">分享這篇</span>'}
+            <button type="button" class="share__btn" data-share-url="${escapeHtml(url)}"${label('複製連結')} hidden>
+              ${clip}${text('複製連結')}
             </button>
-            <a class="share__btn" href="https://www.facebook.com/sharer/sharer.php?u=${u}" target="_blank" rel="noopener noreferrer" aria-describedby="newtab-note">
-              ${fb}<span>Facebook</span>
+            <a class="share__btn" href="https://www.facebook.com/sharer/sharer.php?u=${u}" target="_blank" rel="noopener noreferrer" aria-describedby="newtab-note"${label('分享到 Facebook')}>
+              ${fb}${text('Facebook')}
             </a>
-            <a class="share__btn" href="https://social-plugins.line.me/lineit/share?url=${u}&amp;text=${t}" target="_blank" rel="noopener noreferrer" aria-describedby="newtab-note">
-              ${line}<span>LINE</span>
+            <a class="share__btn" href="https://social-plugins.line.me/lineit/share?url=${u}&amp;text=${t}" target="_blank" rel="noopener noreferrer" aria-describedby="newtab-note"${label('分享到 LINE')}>
+              ${line}${text('LINE')}
             </a>
             <span class="share__status" role="status" aria-live="polite"></span>
           </div>`;
@@ -1654,18 +1660,21 @@ function renderPost(post, posts) {
       <div class="wrap">
         <article class="post">
           ${crumbsNav(crumbs)}
-          <p class="post__meta">
-            <span class="post__author">作者：${escapeHtml(post.author)}</span>
-            <span class="dot" aria-hidden="true">·</span>
-            <span>發布 <time datetime="${isoDate(post.published)}">${fmtDate(post.published)}</time></span>
-            ${
-              sameDay
-                ? ''
-                : `<span class="dot" aria-hidden="true">·</span><span>最後更新 <time datetime="${isoDate(post.updated)}">${fmtDate(post.updated)}</time></span>`
-            }
-            <span class="dot" aria-hidden="true">·</span>
-            <span>瀏覽 ${viewsSlot(post.slug)}</span>
-          </p>
+          <div class="post__head">
+            <p class="post__meta">
+              <span class="post__author">作者：${escapeHtml(post.author)}</span>
+              <span class="dot" aria-hidden="true">·</span>
+              <span>發布 <time datetime="${isoDate(post.published)}">${fmtDate(post.published)}</time></span>
+              ${
+                sameDay
+                  ? ''
+                  : `<span class="dot" aria-hidden="true">·</span><span>最後更新 <time datetime="${isoDate(post.updated)}">${fmtDate(post.updated)}</time></span>`
+              }
+              <span class="dot" aria-hidden="true">·</span>
+              <span>瀏覽 ${viewsSlot(post.slug)}</span>
+            </p>
+${shareBlock(post, { compact: true })}
+          </div>
 ${reprintNotice(post)}
           <div class="prose">
 ${post.html}

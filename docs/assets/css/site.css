@@ -1341,6 +1341,39 @@ h1, h2, h3, h4 {
 
 /* ------------------------------------------------------- 分享列 --- */
 
+/* 作者列在左、精簡分享鈕在右；窄螢幕自動換行到下一列 */
+.post__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: .75rem 1rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 1.75rem;
+}
+
+/* 邊框改由 .post__head 承擔，避免出現兩條線 */
+.post__head .post__meta {
+  padding-bottom: 0;
+  border-bottom: 0;
+  margin-bottom: 0;
+}
+
+/* 精簡版：只有圖示，可及名稱由 aria-label 提供 */
+.share--compact {
+  margin: 0;
+  padding-top: 0;
+  border-top: 0;
+  gap: .4rem;
+}
+
+.share--compact .share__btn {
+  padding: .45rem;
+  min-width: 2.5rem;
+  justify-content: center;
+}
+
 .share {
   display: flex;
   flex-wrap: wrap;
