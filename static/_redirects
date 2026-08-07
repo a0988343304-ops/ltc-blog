@@ -8,8 +8,6 @@
 /20260802-introduction/  /20260804-my-ltc-journey/  301
 /20260802-introduction   /20260804-my-ltc-journey/  301
 
-# 正式網域改為 peaceyen.net。舊的 pages.dev 與 www 全部收斂到主網域，
-# 避免同一份內容散在三個網址上稀釋搜尋權重。
-# splat（:splat）會把路徑原樣帶過去，深層連結不會斷。
-https://ltc-blog.pages.dev/*   https://peaceyen.net/:splat   301
-https://www.peaceyen.net/*     https://peaceyen.net/:splat   301
+# 網域層級的收斂（www 與舊的 pages.dev → peaceyen.net）不在這裡。
+# Cloudflare Pages 的 _redirects 只比對「路徑」，來源寫完整網址不會生效，
+# 實測會回 200 而不是 301。跨網域轉址改由 functions/_middleware.js 處理。
