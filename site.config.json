@@ -5,7 +5,7 @@
   "description": "聚焦台灣長照機構的營運管理實務：人力配置、法規遵循、品質稽核、成本結構與日常流程改善。",
   "author": "顏和平",
   "lang": "zh-Hant-TW",
-  "siteUrl": "https://ltc-blog.pages.dev",
+  "siteUrl": "https://peaceyen.net",
   "ogImage": {
     "src": "assets/img/og-card.jpg",
     "width": 1200,
@@ -357,7 +357,7 @@
     }
   },
   "counter": {
-    "apiBase": "https://ltc-blog.pages.dev"
+    "apiBase": "https://peaceyen.net"
   },
   "externalLinks": {
     "heading": "外部連結",

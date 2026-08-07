@@ -2,8 +2,14 @@
 # build.mjs 的 cp(STATIC_DIR, OUT_DIR) 會把這個檔案複製到 docs/ 根目錄。
 #
 # 注意：這個檔案只有 Cloudflare Pages 會讀，GitHub Pages 不支援。
-# 鏡像站上的舊網址會直接 404——可以接受，因為 canonical 一律指向 Cloudflare。
+# 鏡像站上的舊網址會直接 404——可以接受，因為 canonical 一律指向正式站。
 
 # 開站時的預設文章換成了真正的自我介紹，網址跟著改。
 /20260802-introduction/  /20260804-my-ltc-journey/  301
 /20260802-introduction   /20260804-my-ltc-journey/  301
+
+# 正式網域改為 peaceyen.net。舊的 pages.dev 與 www 全部收斂到主網域，
+# 避免同一份內容散在三個網址上稀釋搜尋權重。
+# splat（:splat）會把路徑原樣帶過去，深層連結不會斷。
+https://ltc-blog.pages.dev/*   https://peaceyen.net/:splat   301
+https://www.peaceyen.net/*     https://peaceyen.net/:splat   301

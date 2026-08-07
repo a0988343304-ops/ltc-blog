@@ -2,15 +2,15 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
   <channel>
     <title>顏和平｜長照營運與評鑑顧問</title>
-    <link>https://ltc-blog.pages.dev/</link>
+    <link>https://peaceyen.net/</link>
     <description>聚焦台灣長照機構的營運管理實務：人力配置、法規遵循、品質稽核、成本結構與日常流程改善。</description>
     <language>zh-TW</language>
     <lastBuildDate>Tue, 04 Aug 2026 12:40:14 GMT</lastBuildDate>
-    <atom:link href="https://ltc-blog.pages.dev/feed.xml" rel="self" type="application/rss+xml" />
+    <atom:link href="https://peaceyen.net/feed.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>我的長照，從第一線開始</title>
-      <link>https://ltc-blog.pages.dev/20260804-my-ltc-journey/</link>
-      <guid isPermaLink="true">https://ltc-blog.pages.dev/20260804-my-ltc-journey/</guid>
+      <link>https://peaceyen.net/20260804-my-ltc-journey/</link>
+      <guid isPermaLink="true">https://peaceyen.net/20260804-my-ltc-journey/</guid>
       <pubDate>Mon, 03 Aug 2026 16:00:00 GMT</pubDate>
       <description>很多人認識現在的我，是顧問、講師或博士生。但我的長照旅程不是從研究室開始，而是從照顧服務員開始。這篇談我一路走過的角色，以及為什麼我認為長照需要的不只是努力，而是方法。</description>
       <dc:creator>顏和平</dc:creator>

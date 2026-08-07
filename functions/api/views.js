@@ -11,6 +11,10 @@ const SLUG_RE = /^[A-Za-z0-9_-]{1,128}$/;
 
 // GitHub Pages 鏡像站也要能顯示與累計，所以需要 CORS 白名單。
 const ALLOWED_ORIGINS = new Set([
+  'https://peaceyen.net',
+  'https://www.peaceyen.net',
+  // 舊的 pages.dev 保留：已發出去的連結會 301 到新網域，
+  // 但轉址前的那一次請求仍可能從舊來源發出。
   'https://ltc-blog.pages.dev',
   'https://a0988343304-ops.github.io',
   'http://localhost:4173',
