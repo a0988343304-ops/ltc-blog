@@ -1086,11 +1086,12 @@ h1, h2, h3, h4 {
   .cards { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 
-/* 首頁最多放三篇，排成一列比兩張大卡收斂。
-   用 auto-fit 而非固定三欄：文章只有兩篇時會填滿兩欄，
-   不會空一格出來看起來像少了東西。 */
+/* 首頁放六篇，固定三欄排成兩列。
+   這裡不能用 auto-fit：欄數會跟著容器寬度跑，寬螢幕下六張卡會變成
+   四加二，排不成要的兩列。文章不足六篇時最後一列會缺格，那是格線
+   本來的樣子，比欄數忽多忽少好。 */
 @media (min-width: 58rem) {
-  .page-home .cards { grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr)); }
+  .page-home .cards { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 }
 
 .card {
