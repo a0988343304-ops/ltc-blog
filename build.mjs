@@ -163,14 +163,22 @@ function parseFrontMatter(raw) {
 /**
  * 取得檔案的「最後更新時間」。
  * 優先用 git 最後一次提交該檔案的時間（跨機器一致），git 不可用時退回檔案 mtime。
+ *
+ * 但工作區有未提交改動時要例外：那時 git 給的是「上一版」的時間，比手上的
+ * 內容舊。本機建置幾乎都在這個狀態（改完還沒 commit），CI 則永遠是提交後
+ * 才建置，兩邊算出來的日期會差一截，docs/ 就必然對不上，CI 每次都得補一個
+ * 重建 commit。這種情況一律用 mtime——本機是「剛剛」，CI 是提交當下，
+ * 落在同一天，輸出就一致了。
  */
 function lastModified(filePath, fallbackMtime) {
+  const git = (args) =>
+    execFileSync('git', args, {
+      cwd: ROOT, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'],
+    }).trim();
   try {
-    const out = execFileSync(
-      'git',
-      ['log', '-1', '--format=%cI', '--', filePath],
-      { cwd: ROOT, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] },
-    ).trim();
+    // 未追蹤（??）與已修改都算，兩者的 git 提交時間都不代表目前的內容
+    if (git(['status', '--porcelain', '--', filePath])) return fallbackMtime;
+    const out = git(['log', '-1', '--format=%cI', '--', filePath]);
     if (out) return new Date(out);
   } catch {
     /* 尚未 git init、或該檔還沒進版控 —— 落到 mtime */
