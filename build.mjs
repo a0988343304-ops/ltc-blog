@@ -1654,7 +1654,8 @@ function renderPost(post, posts) {
   // mainEntityOfPage / url 刻意與 <link rel=canonical> 同值：
   // 轉載文的正本在原刊媒體，結構化資料的訊號要跟 canonical 一致。
   const pageUrl = postCanonicalUrl(post);
-  const heroUrl = origin ? `${origin}/${String(hero.src).replace(/^\/+/, '')}` : '';
+  // hero 可能是 null（文章沒設 heroImage）——這時結構化資料就不掛 image。
+  const heroUrl = origin && hero ? `${origin}/${String(hero.src).replace(/^\/+/, '')}` : '';
   // 麵包屑與 @id 一律用本站自己的網址：轉載文的 canonical 指向站外，
   // 但它在這個站台的層級位置仍然是「首頁 › 全部文章 › 這一篇」。
   const selfUrl = origin ? `${origin}/${post.slug}/` : '';
