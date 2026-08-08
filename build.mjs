@@ -207,6 +207,40 @@ const isoFmt = new Intl.DateTimeFormat('en-CA', {
   timeZone: TZ, year: 'numeric', month: '2-digit', day: '2-digit',
 });
 
+/**
+ * 中文斷詞：只在詞與詞之間插入 <wbr>，配合 CSS 的 word-break: keep-all，
+ * 讓卡片標題不會斷在詞中間（「什麼」被拆成「什／麼」那種）。
+ *
+ * 中文沒有空白，瀏覽器預設任兩字之間都可斷，純 CSS 無解——word-break 的
+ * auto-phrase 只對日文生效，實測對中文沒有作用。這裡改在建置時用 ICU 的
+ * Intl.Segmenter 斷詞（Node 內建，不需要相依套件）。
+ *
+ * 用 <wbr> 而不是 U+200B：<wbr> 是「斷行機會」的語意標籤，不會在標題文字
+ * 裡塞進看不見的字元，讀者複製標題時也不會夾帶雜訊。
+ */
+const wordSeg = new Intl.Segmenter('zh-Hant', { granularity: 'word' });
+
+/* 禁則：行尾不能落單一個開引號，行首不能落單一個收尾標點。
+   Segmenter 會把標點切成獨立的一段，不處理的話就會出現「走向「」這種行尾。 */
+const OPENERS = /^[「『（〈《【〔［｛(\[{“‘]+$/;
+const CLOSERS = /^[」』）〉》】〕］｝)\]}”’，。、；：？！…—～]+$/;
+
+function segmentTitle(text) {
+  const raw = [...wordSeg.segment(text)].map((s) => s.segment);
+  const merged = [];
+  for (const seg of raw) {
+    const prev = merged[merged.length - 1];
+    if (CLOSERS.test(seg) && prev !== undefined) {
+      merged[merged.length - 1] = prev + seg;          // 收尾標點黏前一段
+    } else if (prev !== undefined && OPENERS.test(prev)) {
+      merged[merged.length - 1] = prev + seg;          // 開引號黏後一段
+    } else {
+      merged.push(seg);
+    }
+  }
+  return merged.map(escapeHtml).join('<wbr>');
+}
+
 const fmtDate = (d) => dateFmt.format(d).replace(/\//g, '-');
 const fmtDateTime = (d) => dateTimeFmt.format(d).replace(/\//g, '-');
 const isoDate = (d) => isoFmt.format(d);
@@ -624,7 +658,7 @@ ${posts
     return `        <li class="card">
           <article>
             ${thumb}
-            <h${titleLevel} class="card__title"><a href="${escapeHtml(up + p.slug)}/">${escapeHtml(p.title)}</a></h${titleLevel}>
+            <h${titleLevel} class="card__title"><a href="${escapeHtml(up + p.slug)}/">${segmentTitle(p.title)}</a></h${titleLevel}>
             ${p.summary ? `<p class="card__summary">${escapeHtml(p.summary)}</p>` : ''}
             ${
               p.tags.length

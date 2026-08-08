@@ -6,7 +6,10 @@
 
 :root {
   --content: 42rem;        /* 內容文字區寬度：HERO 圖的寬度上限也是它 */
-  --wrap: 60rem;           /* 外層容器（卡片區可以比文字區寬一些） */
+  /* 外層容器（卡片區可以比文字區寬一些）。60rem 時三欄卡片的標題只剩
+     250px，長標題排不下 17 個字，會多掉出一行；65rem 讓標題有 276px。
+     文章內文吃的是 --content，不受這裡影響，閱讀寬度沒有變。 */
+  --wrap: 65rem;
   --gap: 1.25rem;
 
   --bg: #ffffff;
@@ -1134,7 +1137,15 @@ h1, h2, h3, h4 {
    注意別為此關掉 balance——關掉會變成貪婪斷行，尾行只剩兩三個字，
    比原本更糟。中文字與字之間本來就可以斷，「困境」被拆開沒辦法用
    CSS 避免，只能靠減少斷行次數降低機會。 */
-.card__title { margin: 0 0 .5rem; font-size: 1.05rem; }
+/* keep-all + build.mjs 插入的 <wbr>：只在詞界斷行。
+   若少了 keep-all，全域的 word-break: break-word 仍會讓它斷在字中間，
+   <wbr> 就白加了。 */
+.card__title {
+  margin: 0 0 .5rem;
+  font-size: 1rem;
+  word-break: keep-all;
+  overflow-wrap: normal;
+}
 /* padding 撐高命中框（26px → 約 37px），負邊距抵銷掉多出來的高度，
    卡片版面與改動前完全一致（CLS 仍為 0）。 */
 .card__title a {
