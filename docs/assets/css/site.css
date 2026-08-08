@@ -1126,7 +1126,15 @@ h1, h2, h3, h4 {
   display: block;
 }
 
-.card__title { margin: 0 0 .5rem; font-size: 1.12rem; }
+/* 字級比內文標題小一級（1.12rem → 1.05rem）。
+   三欄的卡片內寬只有 250px 上下，1.12rem 會讓長標題多撐出一行；
+   h1–h4 繼承來的 text-wrap: balance 要把三行拉平，就只能把第一行
+   壓到 143px（框有 249px），看起來像斷錯地方。少一行之後 balance
+   排得開，實測四個標題的最短行從 67px 回到 168px。
+   注意別為此關掉 balance——關掉會變成貪婪斷行，尾行只剩兩三個字，
+   比原本更糟。中文字與字之間本來就可以斷，「困境」被拆開沒辦法用
+   CSS 避免，只能靠減少斷行次數降低機會。 */
+.card__title { margin: 0 0 .5rem; font-size: 1.05rem; }
 /* padding 撐高命中框（26px → 約 37px），負邊距抵銷掉多出來的高度，
    卡片版面與改動前完全一致（CLS 仍為 0）。 */
 .card__title a {
