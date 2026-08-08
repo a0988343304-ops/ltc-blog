@@ -1837,7 +1837,13 @@ if (origin) {
   // 才是它們真正的 lastmod。以前一律用 contentUpdated，代表隨便發一篇
   // 新文章這五頁的 lastmod 就一起跳日期——Google 觀察到 lastmod 與實際
   // 內容變動不符時會整站忽略這個訊號，之後真的改了 /about/ 反而沒得用。
-  const configMtime = (await stat(join(ROOT, 'site.config.json'))).mtime;
+  //
+  // 這裡要的是 git 的提交時間，不是檔案 mtime：CI 每次都是全新 clone，
+  // checkout 會把所有檔案的 mtime 設成「檢出的那一刻」，於是這四頁的
+  // lastmod 在 CI 永遠是今天、在本機是真正的編輯日，兩邊必然對不上，
+  // 「若 docs/ 有落差則推回」那一步就每次都補一個重建 commit。
+  const configPath = join(ROOT, 'site.config.json');
+  const configUpdated = lastModified(configPath, (await stat(configPath)).mtime);
 
   const urls = [
     // 首頁的 lastmod 要反映「所有文章的最新更新時間」。
@@ -1848,7 +1854,7 @@ if (origin) {
       // /articles/ 是例外：它的內容確實隨文章清單變動。
       lastmod: p.slug === 'articles'
         ? isoDate(contentUpdated || new Date())
-        : isoDate(configMtime),
+        : isoDate(configUpdated),
     })),
     // canonical 指向站外的轉載文不進 sitemap：一邊說「正本在別人家」、
     // 一邊請 Google 索引自己這一份，只會換來「重複網頁」的排除項。
@@ -1881,6 +1887,10 @@ if (origin) {
    */
   const feedPosts = posts.filter((p) => !p.originalUrl);
   const rssDate = (d) => new Date(d).toUTCString();
+  // lastBuildDate 只取到「日」（台北時間的 00:00）。新文章在本機建置時還沒
+  // commit，updated 會退回檔案 mtime，等 CI commit 之後才變成 git 時間——
+  // 保留時分秒就代表兩邊必然不同。RSS 讀取端只用它判斷「有沒有更新」，
+  // 日期粒度足夠，換來的是建置結果可重現。
   const feedItems = feedPosts
     .map((p) => {
       const url = `${origin}/${p.slug}/`;
@@ -1905,7 +1915,7 @@ ${p.tags.map((t) => `      <category>${escapeHtml(t)}</category>`).join('\n')}
     <link>${escapeHtml(`${origin}/`)}</link>
     <description>${escapeHtml(site.description)}</description>
     <language>zh-TW</language>
-    <lastBuildDate>${rssDate(contentUpdated || new Date())}</lastBuildDate>
+    <lastBuildDate>${rssDate(`${isoDate(contentUpdated || new Date())}T00:00:00+08:00`)}</lastBuildDate>
     <atom:link href="${escapeHtml(`${origin}/feed.xml`)}" rel="self" type="application/rss+xml" />
 ${feedItems}
   </channel>
