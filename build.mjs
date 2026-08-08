@@ -225,6 +225,34 @@ const wordSeg = new Intl.Segmenter('zh-Hant', { granularity: 'word' });
 const OPENERS = /^[「『（〈《【〔［｛(\[{“‘]+$/;
 const CLOSERS = /^[」』）〉》】〕］｝)\]}”’，。、；：？！…—～]+$/;
 
+/**
+ * 卡片標題的 HTML。
+ *
+ * 自動斷行只看寬度，給不出「這一行到這裡為止」的編輯判斷，所以文章可以用
+ * front matter 的 cardTitleWrap 指定斷行點（把 title 抄一次，想斷的地方加 |）。
+ * 手動斷點只在首頁三欄的寬度生效——那是它被調出來的版面，換到別的寬度硬套
+ * 反而更難看，窄畫面就退回詞界自動斷行（CSS 把 <br> 藏起來，相鄰的 <wbr>
+ * 仍然提供斷行機會）。
+ *
+ * 抄錯會在建置時擋下來，不會靜靜地顯示成另一個標題。
+ */
+function cardTitleHtml(post) {
+  const wrap = post.cardTitleWrap;
+  if (!wrap) return segmentTitle(post.title);
+
+  if (wrap.replace(/\|/g, '') !== post.title) {
+    throw new Error(
+      `${post.slug}: cardTitleWrap 去掉 | 之後與 title 不一致，請對照修正。\n` +
+        `  title:          ${post.title}\n` +
+        `  cardTitleWrap:  ${wrap.replace(/\|/g, '')}`,
+    );
+  }
+  return wrap
+    .split('|')
+    .map((chunk) => segmentTitle(chunk))
+    .join('<wbr><br class="title-brk" />');
+}
+
 function segmentTitle(text) {
   const raw = [...wordSeg.segment(text)].map((s) => s.segment);
   const merged = [];
@@ -276,6 +304,8 @@ async function loadPosts() {
       slug,
       file: full,
       title: data.title || slug,
+      // 卡片標題的手動斷行：把 title 原封不動抄一次，在想斷的位置加 |。
+      cardTitleWrap: data.cardTitleWrap || '',
       summary: data.summary || '',
       // SERP 專用：頁面上顯示的 title/summary 維持完整，這兩個欄位只餵給
       // <title> 與 meta description，讓搜尋結果不被截斷。
@@ -658,7 +688,7 @@ ${posts
     return `        <li class="card">
           <article>
             ${thumb}
-            <h${titleLevel} class="card__title"><a href="${escapeHtml(up + p.slug)}/">${segmentTitle(p.title)}</a></h${titleLevel}>
+            <h${titleLevel} class="card__title"><a href="${escapeHtml(up + p.slug)}/">${cardTitleHtml(p)}</a></h${titleLevel}>
             ${p.summary ? `<p class="card__summary">${escapeHtml(p.summary)}</p>` : ''}
             ${
               p.tags.length

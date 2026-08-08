@@ -1146,6 +1146,14 @@ h1, h2, h3, h4 {
   word-break: keep-all;
   overflow-wrap: normal;
 }
+
+/* cardTitleWrap 指定的手動斷點。預設關掉：那些斷點是照首頁三欄的卡片寬度
+   調的，換到全部文章頁的兩欄（卡片寬得多）或手機單欄，硬套只會更難看。
+   關掉時緊鄰的 <wbr> 仍提供斷行機會，退回詞界自動斷行。 */
+.card__title .title-brk { display: none; }
+@media (min-width: 58rem) {
+  .page-home .card__title .title-brk { display: inline; }
+}
 /* padding 撐高命中框（26px → 約 37px），負邊距抵銷掉多出來的高度，
    卡片版面與改動前完全一致（CLS 仍為 0）。 */
 .card__title a {
