@@ -613,11 +613,35 @@ h1, h2, h3, h4 {
 
 /* ------------------------------------------------------- 外部連結 --- */
 
+/* 左右兩欄：左邊外部連結、右邊研究發表。窄畫面疊成上下兩塊。 */
+.external__cols {
+  margin-top: clamp(1.5rem, 4vw, 2rem);
+  display: grid;
+  gap: clamp(1.5rem, 4vw, 2.5rem);
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 52rem) {
+  .external__cols { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+.external__head {
+  margin: 0;
+  font-size: 1.05rem;
+  padding-bottom: .6rem;
+  border-bottom: 2px solid var(--border);
+}
+
+.external__lede {
+  margin: .6rem 0 0;
+  font-size: .86rem;
+  color: var(--text-muted);
+}
+
 .external__list {
   list-style: none;
-  margin: clamp(1.5rem, 4vw, 2rem) auto 0;
+  margin: .4rem 0 0;
   padding: 0;
-  max-width: var(--content);
   display: grid;
   gap: 0;
 }
@@ -641,6 +665,15 @@ h1, h2, h3, h4 {
 }
 
 .external__site { font-weight: 600; }
+
+/* 參考文獻的懸掛縮排：第二行起內縮，一眼看得出一筆到哪裡結束。 */
+.external__item--ref {
+  font-size: .88rem;
+  line-height: 1.85;
+  color: var(--text);
+  padding-left: 1.6em;
+  text-indent: -1.6em;
+}
 
 /* --------------------------------------------------- 團隊領導成果 --- */
 

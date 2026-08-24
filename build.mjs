@@ -1481,27 +1481,45 @@ ${l.paragraphs.map((t) => `              <p>${escapeHtml(t)}</p>`).join('\n')}
  * 刊在別人網站上的作品與授課紀錄，對讀者是佐證，
  * 對搜尋引擎也是「這個人在站外真的存在」的關聯訊號。
  */
+/**
+ * 外部連結與研究發表，左右兩欄。
+ *
+ * 兩欄的項目長得不一樣：外部連結有網址，點得進去；研究發表是期刊與專書的
+ * 引用，沒有可連的頁面，就純文字列出（item 有 url 走連結、有 text 走引用）。
+ */
 function externalLinksBlock() {
   const e = site.externalLinks;
-  if (!Array.isArray(e?.items) || !e.items.length) return '';
+  const groups = (e?.groups || []).filter((g) => Array.isArray(g.items) && g.items.length);
+  if (!groups.length) return '';
+
+  const item = (i) =>
+    i.url
+      ? `              <li class="external__item">
+                <a href="${escapeHtml(i.url)}" target="_blank" rel="noopener noreferrer" aria-describedby="newtab-note">${escapeHtml(i.title)}</a>
+                <p class="external__meta">
+                  <span class="external__site">${escapeHtml(i.site)}</span>${i.note ? `<span class="dot" aria-hidden="true">·</span><span>${escapeHtml(i.note)}</span>` : ''}
+                </p>
+              </li>`
+      : `              <li class="external__item external__item--ref">${escapeHtml(i.text)}</li>`;
 
   return `
       <section class="section external">
         <div class="wrap">
           <h2 class="section__head section__head--center">${escapeHtml(e.heading || '外部連結')}</h2>
           ${e.lede ? `<p class="section__lede section__lede--center">${escapeHtml(e.lede)}</p>` : ''}
-          <ul class="external__list">
-${e.items
+          <div class="external__cols">
+${groups
   .map(
-    (i) => `            <li class="external__item">
-              <a href="${escapeHtml(i.url)}" target="_blank" rel="noopener noreferrer" aria-describedby="newtab-note">${escapeHtml(i.title)}</a>
-              <p class="external__meta">
-                <span class="external__site">${escapeHtml(i.site)}</span>${i.note ? `<span class="dot" aria-hidden="true">·</span><span>${escapeHtml(i.note)}</span>` : ''}
-              </p>
-            </li>`,
+    (g) => `            <div class="external__col">
+              <h3 class="external__head">${escapeHtml(g.heading)}</h3>
+              ${g.lede ? `<p class="external__lede">${escapeHtml(g.lede)}</p>` : ''}
+              <ul class="external__list">
+${g.items.map(item).join('\n')}
+              </ul>
+            </div>`,
   )
   .join('\n')}
-          </ul>
+          </div>
         </div>
       </section>`;
 }
