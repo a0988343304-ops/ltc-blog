@@ -791,8 +791,13 @@ h1, h2, h3, h4 {
   text-wrap: pretty;
 }
 
-/* 桌機：橫式流程，連接線穿過圖示中心 */
-@media (min-width: 52rem) {
+/* 桌機：橫式流程，連接線穿過圖示中心。
+   斷點是 66rem 而不是 52rem：五欄各自只有 (容器 − 四個間距) ÷ 5 那麼寬，
+   在 52rem 時每欄僅約 144px，最長的那筆角色「長照與 NPO 經營管理 / 雙碩士」
+   要 181px，一定會斷成兩行。容器上限是 --wrap 65rem，所以視窗到 66rem 之後
+   每欄穩定有 188px 以上——換句話說，只要是橫式就一定排得下一行。
+   52rem 到 66rem 之間改用直式，那本來就是既有的版面。 */
+@media (min-width: 66rem) {
   .journey__list {
     grid-template-columns: repeat(5, minmax(0, 1fr));
     gap: 1.25rem;
