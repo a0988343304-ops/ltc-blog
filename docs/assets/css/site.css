@@ -26,6 +26,9 @@
   --accent-soft: #e6f4f0;
   /* 放在 --accent 上的前景色。淺色模式 #ffffff 對 #0f6f5c 是 6.09:1（AA 通過）。 */
   --on-accent: #ffffff;
+  /* 深橘：文章結語的重點色。#a3490b 對 --bg 5.97:1、對 --bg-soft 5.56:1，
+     都超過 WCAG AA 的 4.5:1。 */
+  --accent-warm: #a3490b;
   --shadow: 0 1px 2px rgba(16, 32, 48, .06), 0 8px 24px rgba(16, 32, 48, .06);
   --radius: 14px;
 }
@@ -48,6 +51,9 @@
     /* 深色模式的 --accent 是淺薄荷綠，白字只有 1.97:1（遠低於 AA 的 4.5:1）。
        改用深色前景 #0b1a16 對 #5ecbb0 是 11.20:1。 */
     --on-accent: #0b1a16;
+    /* 深色底不能用深橘（對 --bg 只有 1.4 左右），改用淺橘：
+       #f0a868 對 --bg 9.33:1、對 --surface 8.39:1。 */
+    --accent-warm: #f0a868;
     --shadow: 0 1px 2px rgba(0, 0, 0, .3), 0 8px 24px rgba(0, 0, 0, .35);
   }
 }
@@ -1299,6 +1305,14 @@ h1, h2, h3, h4 {
 
 .prose { font-size: 1.02rem; }
 .prose > :first-child { margin-top: 0; }
+
+/* 結語的重點句。文章末尾用深橘拉出重量，與全站的綠／藍系拉開。
+   只靠顏色不足以傳達重點（色覺障礙、單色列印），所以同時加粗並拉大字級。 */
+.prose .closing-note {
+  color: var(--accent-warm);
+  font-weight: 700;
+  font-size: 1.08em;
+}
 
 .prose h2 {
   margin: 2.4rem 0 .9rem;
